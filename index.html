@@ -3,8 +3,13 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Seb's Adventure Almanac - Prototype v0.9</title>
+  <title>Seb's Adventure Almanac</title>
   <meta name="description" content="A local-first visual almanac of places Seb has visited." />
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Seb's Atlas">
+  <meta name="theme-color" content="#f7efe2">
   <style>
     :root {
       --canvas: #f7f0e6;
@@ -1011,6 +1016,26 @@
 
     .nav-emoji { width: 1.4em; text-align: center; }
 
+    .nav-group-toggle {
+      width: 100%;
+      border: 0;
+      background: transparent;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      padding: 0 12px;
+    }
+
+    .nav-group-toggle:hover { color: var(--oracle-dark); }
+
+    .nav-manage-items {
+      display: grid;
+      gap: 0;
+    }
+
+    .nav-manage-items.collapsed { display: none; }
+
 
 
     /* v0.5 preserved interaction polish */
@@ -1479,6 +1504,54 @@
       .map-card-header { gap: 10px; }
     }
 
+
+    /* v0.18 mobile navigation polish */
+    .mobile-nav-toggle {
+      display: none;
+      width: 100%;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--card-strong);
+      color: var(--oracle-dark);
+      font-weight: 900;
+      padding: 11px 14px;
+      box-shadow: 0 8px 18px rgba(48,37,24,.06);
+    }
+
+    @media (max-width: 760px) {
+      .sidebar {
+        position: sticky;
+        top: 0;
+        z-index: 30;
+        height: auto;
+        max-height: 100vh;
+        overflow-y: auto;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .brand { margin-bottom: 12px; }
+      .mobile-nav-toggle { display: inline-flex; }
+
+      .sidebar:not(.nav-open) .nav-area,
+      .sidebar:not(.nav-open) .footer-note {
+        display: none;
+      }
+
+      .sidebar.nav-open .nav-area {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 6px;
+        margin-top: 12px;
+      }
+
+      .sidebar.nav-open .footer-note { display: block; }
+      .main { padding: 14px; }
+    }
+
     @media print {
       body { background: white; }
       .sidebar, .toolbar, .button, .mini-button, .modal-backdrop, .toast { display: none !important; }
@@ -1497,6 +1570,142 @@
     }
 
     .timeline-controls { margin-bottom: 16px; }
+
+
+    .timeline-summary-panel {
+      display: grid;
+      gap: 14px;
+      margin: 16px 0;
+    }
+
+    .timeline-metric-row {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .timeline-metric-card,
+    .timeline-range-card {
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: rgba(255,250,241,.92);
+      box-shadow: 0 10px 22px rgba(48,37,24,.05);
+    }
+
+    .timeline-metric-card {
+      min-height: 92px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .timeline-metric-card span {
+      font-size: 24px;
+      line-height: 1;
+    }
+
+    .timeline-metric-card strong {
+      display: block;
+      font-size: 30px;
+      line-height: 1;
+      letter-spacing: -.05em;
+      color: var(--ink);
+    }
+
+    .timeline-metric-card em {
+      display: block;
+      font-style: normal;
+      color: var(--muted);
+      font-weight: 800;
+      font-size: 13px;
+      line-height: 1.25;
+    }
+
+    .timeline-range-card {
+      padding: 18px;
+    }
+
+    .timeline-range-label {
+      color: var(--teal);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .timeline-range-track {
+      display: grid;
+      grid-template-columns: minmax(120px, auto) 1fr minmax(120px, auto);
+      align-items: center;
+      gap: 14px;
+    }
+
+    .timeline-point {
+      border: 1px solid rgba(40,112,106,.18);
+      border-radius: 16px;
+      background: rgba(40,112,106,.08);
+      padding: 12px 14px;
+      min-width: 0;
+    }
+
+    .timeline-point strong,
+    .timeline-point em {
+      display: block;
+    }
+
+    .timeline-point strong {
+      color: var(--ink);
+      font-size: 18px;
+      line-height: 1.15;
+    }
+
+    .timeline-point em {
+      margin-top: 3px;
+      color: var(--muted);
+      font-style: normal;
+      font-size: 12px;
+      font-weight: 850;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .timeline-line {
+      height: 4px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(200,148,47,.35), rgba(40,112,106,.55), rgba(197,82,45,.35));
+      position: relative;
+    }
+
+    .timeline-line:before,
+    .timeline-line:after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      background: var(--teal);
+      transform: translateY(-50%);
+      box-shadow: 0 0 0 4px rgba(40,112,106,.12);
+    }
+
+    .timeline-line:before { left: 0; }
+    .timeline-line:after { right: 0; }
+
+    @media (max-width: 980px) {
+      .timeline-metric-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 620px) {
+      .timeline-metric-row { grid-template-columns: 1fr; }
+      .timeline-range-track { grid-template-columns: 1fr; }
+      .timeline-line { height: 42px; width: 4px; justify-self: center; background: linear-gradient(180deg, rgba(200,148,47,.35), rgba(40,112,106,.55), rgba(197,82,45,.35)); }
+      .timeline-line:before { left: 50%; top: 0; transform: translate(-50%, -50%); }
+      .timeline-line:after { left: 50%; right: auto; top: 100%; transform: translate(-50%, -50%); }
+    }
 
     .timeline-control-grid {
       display: grid;
@@ -1614,6 +1823,20 @@
       flex-direction: column;
       justify-content: space-between;
       gap: 10px;
+      cursor: pointer;
+      transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease, background .16s ease;
+    }
+
+    .timeline-place-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(40,112,106,.36);
+      box-shadow: 0 14px 28px rgba(48,37,24,.09);
+      background: rgba(255,253,248,.98);
+    }
+
+    .timeline-place-card:focus-visible {
+      outline: none;
+      box-shadow: var(--focus), 0 14px 28px rgba(48,37,24,.09);
     }
 
     .timeline-place-top {
@@ -1656,15 +1879,108 @@
       margin-top: 10px;
     }
 
+    .timeline-bulk-card { margin-top: 16px; }
+
+    .timeline-bulk-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .timeline-bulk-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(180px, 1fr));
+      gap: 14px;
+      align-items: end;
+    }
+
+    .timeline-bulk-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+      align-items: center;
+    }
+
+    .timeline-select-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .timeline-select-check {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--red);
+    }
+
+    .timeline-selected-count {
+      font-weight: 900;
+      color: var(--teal);
+    }
+
+    .timeline-bulk-preview {
+      margin-top: 12px;
+      border-radius: 20px;
+      border: 1px dashed rgba(197, 82, 45, .35);
+      background: rgba(255, 250, 240, .72);
+      padding: 14px;
+    }
+
     @media (max-width: 980px) {
       .timeline-control-grid { grid-template-columns: 1fr 1fr; }
+      .timeline-bulk-grid { grid-template-columns: 1fr 1fr; }
       .timeline-month { grid-template-columns: 1fr; }
       .timeline-month-label { position: static; }
     }
 
     @media (max-width: 640px) {
       .timeline-control-grid { grid-template-columns: 1fr; }
+      .timeline-bulk-grid { grid-template-columns: 1fr; }
       .timeline-place-grid { grid-template-columns: 1fr; }
+    }
+
+
+    /* v0.25+ Travel events, cruises and flights; v0.27 explore/admin timeline separation */
+    .travel-control-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; align-items: end; }
+    .travel-summary-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin: 16px 0; }
+    .travel-summary-card { padding: 16px; border: 1px solid var(--line); border-radius: var(--radius-small); background: rgba(255,250,241,.82); box-shadow: var(--shadow); }
+    .travel-summary-card strong { display:block; font-size: 2rem; line-height: 1; color: var(--ink); }
+    .travel-summary-card span { display:block; margin-top: 6px; color: var(--muted); font-weight: 800; font-size: .9rem; }
+    .travel-event-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .travel-event-card { border: 1px solid var(--line); background: rgba(255,250,241,.92); border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow); }
+    .travel-event-head { display:flex; gap: 12px; align-items:flex-start; justify-content:space-between; }
+    .travel-event-title { margin: 0; font-size: 1.2rem; line-height: 1.15; }
+    .travel-event-icon { width:44px; height:44px; display:grid; place-items:center; border-radius: 16px; background:#fff3de; font-size:1.4rem; flex: 0 0 auto; }
+    .travel-meta-grid { display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 14px; }
+    .travel-meta-cell { border:1px solid var(--line); border-radius: var(--radius-small); padding: 10px; background: rgba(255,255,255,.62); }
+    .travel-meta-cell span { display:block; color:var(--muted); font-size:.78rem; font-weight:800; text-transform:uppercase; letter-spacing:.04em; }
+    .travel-meta-cell strong { display:block; margin-top:4px; font-size:.95rem; }
+    .travel-empty { border:1px dashed var(--line); border-radius:var(--radius); padding:22px; background:rgba(255,250,241,.65); color:var(--muted); }
+    .travel-editor-card { margin-bottom: 16px; }
+    .travel-editor-card.collapsed .travel-editor-body { display:none; }
+    .travel-editor-toggle { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+    .travel-mini-map { min-height: 360px; border-radius: var(--radius); overflow:hidden; border:1px solid var(--line); background:#efe6d9; }
+    .travel-map-layout { display:grid; grid-template-columns: minmax(0, 1.25fr) minmax(320px, .75fr); gap:16px; align-items:start; }
+    .flight-layout { display:grid; grid-template-columns: minmax(0, 1fr); gap:16px; }
+    .route-list { display:grid; gap:10px; margin-top: 12px; }
+    .route-row { display:grid; grid-template-columns: auto 1fr auto; gap:10px; align-items:center; border:1px solid var(--line); border-radius:var(--radius-small); padding:10px; background:rgba(255,255,255,.64); }
+    .route-number { width:28px; height:28px; border-radius:50%; display:grid; place-items:center; background:#fff3de; font-weight:900; }
+    .travel-tools-card { margin-top: 16px; }
+    .travel-import-area { min-height: 120px; }
+    @media (max-width: 960px) {
+      .travel-control-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .travel-summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .travel-event-grid { grid-template-columns: 1fr; }
+      .travel-map-layout { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 640px) {
+      .travel-control-grid, .travel-summary-grid, .travel-meta-grid { grid-template-columns: 1fr; }
+      .travel-mini-map { min-height: 300px; }
     }
 
   </style>
@@ -1676,24 +1992,33 @@
         <div class="brand-mark">SA</div>
         <div>
           <h1>Seb's Adventure Almanac</h1>
-          <p>Prototype v0.15 · Guided Seb capture · Local-first</p>
         </div>
       </div>
-      <div class="nav-area">
+      <button class="mobile-nav-toggle" id="mobileNavToggle" type="button" aria-controls="navArea" aria-expanded="false">☰ Menu</button>
+      <div class="nav-area" id="navArea">
         <div class="nav-group-label">Explore</div>
         <button class="nav-button active" data-section="dashboard"><span class="nav-left"><span class="nav-emoji">🧭</span>Home</span> <span class="pill-count" id="navTotal">0</span></button>
         <button class="nav-button" data-section="almanac"><span class="nav-left"><span class="nav-emoji">📚</span>Almanac</span> <span class="pill-count" id="navKnown">0</span></button>
+        <button class="nav-button" data-section="holidays"><span class="nav-left"><span class="nav-emoji">🏝️</span>Holidays</span> <span class="pill-count" id="navHolidays">0</span></button>
+        <button class="nav-button" data-section="cruises"><span class="nav-left"><span class="nav-emoji">🚢</span>Cruises</span> <span class="pill-count" id="navCruises">0</span></button>
+        <button class="nav-button" data-section="flights"><span class="nav-left"><span class="nav-emoji">✈️</span>Flights</span> <span class="pill-count" id="navFlights">0</span></button>
         <button class="nav-button" data-section="timeline"><span class="nav-left"><span class="nav-emoji">🗓️</span>Timeline</span> <span class="pill-count" id="navTimeline">0</span></button>
         <button class="nav-button" data-section="quiz"><span class="nav-left"><span class="nav-emoji">🧠</span>Quiz</span> <span class="pill-count" id="navQuiz">0</span></button>
         <div class="nav-group-label">Map</div>
         <button class="nav-button" data-section="hierarchy"><span class="nav-left"><span class="nav-emoji">🌍</span>Map & hierarchy</span></button>
-        <div class="nav-group-label">Manage</div>
-        <button class="nav-button" data-section="add"><span class="nav-left"><span class="nav-emoji">➕</span>Add places</span></button>
-        <button class="nav-button" data-section="queue"><span class="nav-left"><span class="nav-emoji">✨</span>Enrich queue</span> <span class="pill-count" id="navQueue">0</span></button>
-        <button class="nav-button" data-section="import"><span class="nav-left"><span class="nav-emoji">📥</span>Import centre</span></button>
-        <button class="nav-button" data-section="settings"><span class="nav-left"><span class="nav-emoji">⚙️</span>Settings & data</span></button>
+        <button class="nav-group-label nav-group-toggle" id="manageNavToggle" type="button" aria-controls="manageNavItems" aria-expanded="false"><span>Manage</span><span id="manageNavChevron" aria-hidden="true">▸</span></button>
+        <div class="nav-manage-items collapsed" id="manageNavItems">
+          <button class="nav-button" data-section="add"><span class="nav-left"><span class="nav-emoji">➕</span>Add places</span></button>
+          <button class="nav-button" data-section="addTravel" data-travel-create="holiday"><span class="nav-left"><span class="nav-emoji">🏝️</span>Add Holiday</span></button>
+          <button class="nav-button" data-section="addTravel" data-travel-create="cruise"><span class="nav-left"><span class="nav-emoji">🚢</span>Add Cruise</span></button>
+          <button class="nav-button" data-section="addFlight" data-flight-create="new"><span class="nav-left"><span class="nav-emoji">✈️</span>Add Flight</span></button>
+          <button class="nav-button" data-section="editTimeline"><span class="nav-left"><span class="nav-emoji">🗓️</span>Edit Timeline</span></button>
+          <button class="nav-button" data-section="queue"><span class="nav-left"><span class="nav-emoji">✨</span>Enrich queue</span> <span class="pill-count" id="navQueue">0</span></button>
+          <button class="nav-button" data-section="import"><span class="nav-left"><span class="nav-emoji">📥</span>Import centre</span></button>
+          <button class="nav-button" data-section="settings"><span class="nav-left"><span class="nav-emoji">⚙️</span>Settings & data</span></button>
+        </div>
       </div>
-      <p class="footer-note">Data is stored in this browser. v0.3 remains the stable import base; v0.5 preserves quiz and hierarchy polish; v0.7 proved MapLibre could work; v0.8 added clickable pins and truthful map focus; v0.9 makes the map the primary experience while preserving the offline coordinate fallback; v0.10 added reliable capped enrichment batches; v0.11 adds a month/year adventure timeline; v0.12 adds quiz safety filtering and parent-approved question deletion; v0.13 adds multiple visits, cruise ships and cleaner map/timeline behaviour; v0.14 makes the homepage cards useful adventure shortcuts; v0.15 adds a Seb-friendly guided capture journey alongside the parent form; v0.16 tidies the homepage into symmetrical adventure shortcuts.</p>
+      <p class="footer-note">Local-first. Data is stored in this browser.</p>
     </aside>
 
     <main class="main">
@@ -1707,7 +2032,7 @@
               <button class="button primary" data-jump="almanac">Explore almanac</button>
               <button class="button secondary" data-jump="quiz">Start quiz</button>
               <button class="button" data-jump="timeline">Open timeline</button>
-              <button class="button" data-jump="hierarchy">Open map tree</button>
+              <button class="button" data-jump="hierarchy">Open map</button>
               <button class="button" id="surprisePlaceBtn">Surprise me</button>
             </div>
           </div>
@@ -1906,6 +2231,169 @@
         <div id="almanacCards" class="grid cols-3"></div>
       </section>
 
+
+      <section id="holidays" class="section">
+        <div class="hero">
+          <div class="eyebrow">Holiday view</div>
+          <h2>Seb's holidays and breaks.</h2>
+          <p>Browse Seb's holidays, breaks and travel stories by category, style and year. Parent editing tools now live in Manage so this page stays focused on exploring.</p>
+        </div>
+        <div class="card">
+          <div class="travel-control-grid">
+            <label>Holiday type<select id="holidayCategoryFilter"><option value="all">All holiday types</option><option value="vacation">Vacation</option><option value="staycation">Staycation</option><option value="short_break">Short break</option><option value="cruise">Cruise</option><option value="road_trip">Road trip</option></select></label>
+            <label>Trip style<select id="holidayTripTypeFilter"><option value="all">All trip styles</option><option value="single_stay">Single stay</option><option value="multi_stay">Multi-stay</option><option value="self_catering">Self-catering</option><option value="holiday_village">Holiday village</option><option value="fly_cruise">Fly-cruise</option><option value="ex_uk_cruise">Ex-UK cruise</option><option value="open_jaw_cruise">Open-jaw cruise</option><option value="road_trip">Road trip</option></select></label>
+            <label>Year<select id="holidayYearFilter"><option value="all">All years</option></select></label>
+            <label>Search holidays<input id="holidaySearch" placeholder="Dubai, Iona, Wales, Disney..." /></label>
+          </div>
+        </div>
+        <div id="holidaySummary" class="travel-summary-grid"></div>
+        <div id="holidayCards" class="travel-event-grid"></div>
+      </section>
+
+      <section id="addTravel" class="section">
+        <div class="hero">
+          <div class="eyebrow">Parent travel tools</div>
+          <h2 id="travelAdminHeroTitle">Add a holiday.</h2>
+          <p id="travelAdminHeroText">Create or edit parent-managed holiday and cruise records without putting admin forms on Seb's explore pages.</p>
+        </div>
+        <div class="notice warn">This area is for parent-managed travel data. It keeps Seb's explore pages browse-first while preserving the existing travel data schema and import/export flow.</div>
+        <div class="card travel-editor-card" id="travelEditorCard">
+          <div class="travel-editor-toggle">
+            <div>
+              <h3 id="travelEditorTitle">Add or edit a holiday</h3>
+              <p class="help-text">Trips sit above places. One holiday can link to many places, hotels, cruise ports or airports.</p>
+            </div>
+            <div class="toolbar"><button class="button" id="travelEditorNewBtn" type="button">New trip</button></div>
+          </div>
+          <div class="travel-editor-body">
+            <input type="hidden" id="travelEditId" />
+            <div class="form-grid">
+              <div><label>TL / reference<input id="travelLegacyId" placeholder="TL-021" /></label></div>
+              <div><label>Status<select id="travelStatus"><option value="completed">Completed</option><option value="planned">Planned</option></select></label></div>
+              <div class="full"><label>Trip title<input id="travelTitle" placeholder="Florida, USA / Disney’s Yacht Club Resort" /></label></div>
+              <div><label>Holiday type<select id="travelCategory"><option value="vacation">Vacation</option><option value="staycation">Staycation</option><option value="short_break">Short break</option><option value="cruise">Cruise</option><option value="road_trip">Road trip</option><option value="unknown">Unknown</option></select></label></div>
+              <div><label>Trip style<select id="travelTripType"><option value="single_stay">Single stay</option><option value="multi_stay">Multi-stay</option><option value="self_catering">Self-catering</option><option value="holiday_village">Holiday village</option><option value="fly_cruise">Fly-cruise</option><option value="ex_uk_cruise">Ex-UK cruise</option><option value="open_jaw_cruise">Open-jaw cruise</option><option value="road_trip">Road trip</option><option value="unknown">Unknown</option></select></label></div>
+              <div><label>Start month/year<input id="travelStartMonth" placeholder="2025-08" /></label></div>
+              <div><label>Duration<input id="travelDuration" placeholder="14 nights" /></label></div>
+              <div class="full"><label>Travellers<input id="travelTravellers" placeholder="Seb, Mummy, Daddy" /></label></div>
+              <div class="full"><label>Accommodation / ship<input id="travelBase" placeholder="Hotel, villa, cottage or ship" /></label></div>
+              <div><label>Cruise line<input id="travelCruiseLine" placeholder="P&O Cruises" /></label></div>
+              <div><label>Ship name<input id="travelShipName" placeholder="Iona" /></label></div>
+              <div class="full"><label>Cruise route<input id="travelCruiseRoute" placeholder="Round-trip Southampton, Northern Europe" /></label></div>
+              <div class="full"><label>Ports<input id="travelPorts" placeholder="Southampton, Hamburg, Rotterdam" /></label></div>
+              <div class="full"><div class="notice" style="margin-bottom:0;"><strong>Flight links are optional.</strong> Choose no flights, link existing outbound/return flights, or leave the trip marked as needing parent confirmation. Airline, flight number and aircraft can remain unknown.</div></div>
+              <div><label>Flight link status<select id="travelFlightLinkMode"><option value="not_recorded">Not recorded yet</option><option value="no_flights">No flights</option><option value="not_applicable">Not applicable</option><option value="link_existing">Link existing flights</option><option value="needs_parent_confirmation">Needs parent confirmation</option></select></label></div>
+              <div><label>Outbound flight<select id="travelOutboundFlightId"><option value="">No outbound flight linked</option></select></label></div>
+              <div><label>Return flight<select id="travelReturnFlightId"><option value="">No return flight linked</option></select></label></div>
+              <div class="full"><label>Flight notes<input id="travelFlightNotes" placeholder="Example: airports known, airline unknown, needs parent confirmation" /></label></div>
+              <div class="full"><label>Linked almanac places<input id="travelLinkedPlaces" placeholder="Dubai, UAE, Dar Al Masyaf" /></label></div>
+              <div class="full"><label>Tags<input id="travelTags" placeholder="International, Friends trip, Albert holiday" /></label></div>
+              <div class="full"><label>Notes<textarea id="travelNotes" placeholder="Parent-only correction notes or context"></textarea></label></div>
+            </div>
+            <div class="toolbar">
+              <button class="button primary" id="travelSaveBtn" type="button">Save trip</button>
+              <button class="button secondary" id="travelAddOutboundFlightBtn" type="button">Add outbound flight</button>
+              <button class="button secondary" id="travelAddReturnFlightBtn" type="button">Add return flight</button>
+              <button class="button" id="travelClearBtn" type="button">Clear editor</button>
+              <button class="button danger" id="travelDeleteBtn" type="button">Delete trip</button>
+            </div>
+            <div id="travelEditorStatus" style="margin-top:12px;"></div>
+          </div>
+        </div>
+
+        <div class="card travel-tools-card">
+          <h3>Travel data tools</h3>
+          <p class="help-text">Export or import parent-managed trip and flight records. This is separate from almanac place enrichment.</p>
+          <div class="toolbar"><button class="button secondary" id="exportTravelDataBtn" type="button">Export travel data</button><button class="button primary" id="importTravelDataBtn" type="button">Import travel data</button></div>
+          <textarea id="travelDataImportText" class="travel-import-area" placeholder="Paste seb-almanac-travel-data-v1 JSON here, or use the export file as a template."></textarea>
+          <div id="travelDataStatus" style="margin-top:12px;"></div>
+        </div>
+
+      </section>
+
+      <section id="cruises" class="section">
+        <div class="hero">
+          <div class="eyebrow">Cruise view</div>
+          <h2>Seb's ships, routes and ports.</h2>
+          <p>Browse Seb's cruises by ship, line and route. Choose one cruise to activate the map and see its listed ports together.</p>
+        </div>
+        <div class="card">
+          <div class="travel-control-grid">
+            <label>Cruise<select id="cruiseEventFilter"><option value="all">Browse all cruises</option></select></label>
+            <label>Cruise line<select id="cruiseLineFilter"><option value="all">All cruise lines</option></select></label>
+            <label>Ship<select id="cruiseShipFilter"><option value="all">All ships</option></select></label>
+            <label>Search cruises<input id="cruiseSearch" placeholder="Iona, Barbados, Hamburg, Santorini..." /></label>
+          </div>
+        </div>
+        <div id="cruiseSummary" class="travel-summary-grid"></div>
+        <div class="travel-map-layout">
+          <div><div id="cruiseCards" class="travel-event-grid"></div></div>
+          <div class="card">
+            <h3>Selected cruise map</h3>
+            <p class="help-text">Choose a cruise to see its ports together. Lines are simple visual guides between listed ports, not exact sailing tracks.</p>
+            <div id="cruiseRouteMap" class="travel-mini-map"></div>
+            <div id="cruiseMapStatus" class="help-text" style="margin-top:8px;"></div>
+            <div id="cruisePortList" class="route-list"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="addFlight" class="section">
+        <div class="hero">
+          <div class="eyebrow">Parent flight tools</div>
+          <h2>Add or edit a flight.</h2>
+          <p>Create confirmed or placeholder flight legs for Seb's trips. Known airports are enough to start; airline, flight number and aircraft can remain unknown.</p>
+        </div>
+        <div class="notice warn">This area is for parent-managed flight records. Seb's Flights page remains a browse-first route and airport-code view.</div>
+        <div class="card travel-editor-card" id="flightEditorCard">
+          <div class="travel-editor-toggle"><div><h3 id="flightEditorTitle">Add or edit a flight</h3><p class="help-text">Flights are journeys between airports. Airport details can be partial; airline, flight number and aircraft may stay unknown until confirmed.</p></div><div class="toolbar"><button class="button" id="flightEditorNewBtn" type="button">New flight</button></div></div>
+          <input type="hidden" id="flightEditId" />
+          <div class="form-grid">
+            <div><label>Linked trip<select id="flightTravelEventId"><option value="">No linked trip yet</option></select></label></div>
+            <div><label>Direction<select id="flightDirection"><option value="outbound">Outbound</option><option value="return">Return</option><option value="internal">Internal / transfer</option><option value="unknown">Unknown</option></select></label></div>
+            <div><label>Month/year<input id="flightMonth" placeholder="2025-08" /></label></div>
+            <div><label>Confidence<select id="flightConfidence"><option value="parent_confirmed">Parent confirmed</option><option value="needs_details">Needs details</option><option value="inferred">Inferred / to check</option></select></label></div>
+            <div><label>From airport<input id="flightFromAirport" placeholder="Manchester Airport" /></label></div>
+            <div><label>From code<input id="flightFromIata" placeholder="MAN" maxlength="3" /></label></div>
+            <div><label>To airport<input id="flightToAirport" placeholder="Orlando International Airport" /></label></div>
+            <div><label>To code<input id="flightToIata" placeholder="MCO" maxlength="3" /></label></div>
+            <div><label>Airline<input id="flightAirline" placeholder="Emirates, TUI, British Airways..." /></label></div>
+            <div><label>Flight number<input id="flightNumber" placeholder="Optional" /></label></div>
+            <div><label>Aircraft<input id="flightAircraft" placeholder="Optional" /></label></div>
+            <div class="full"><label>Notes<textarea id="flightNotes" placeholder="Anything to verify or remember about this journey."></textarea></label></div>
+          </div>
+          <div class="toolbar"><button class="button primary" id="flightSaveBtn" type="button">Save flight</button><button class="button" id="flightClearBtn" type="button">Clear editor</button><button class="button danger" id="flightDeleteBtn" type="button">Delete flight</button></div>
+          <div id="flightEditorStatus" style="margin-top:12px;"></div>
+        </div>
+
+      </section>
+
+      <section id="flights" class="section">
+        <div class="hero">
+          <div class="eyebrow">Flight view</div>
+          <h2>Seb's flights and airport codes.</h2>
+          <p>Browse Seb's flight legs and airport codes. The map shows routes where valid airport coordinates are available.</p>
+        </div>
+        <div class="card">
+          <div class="travel-control-grid">
+            <label>Year<select id="flightYearFilter"><option value="all">All years</option></select></label>
+            <label>Airline<select id="flightAirlineFilter"><option value="all">All airlines</option></select></label>
+            <label>Confidence<select id="flightConfidenceFilter"><option value="all">All confidence levels</option><option value="parent_confirmed">Parent confirmed</option><option value="needs_details">Needs details</option><option value="inferred">Inferred / to check</option></select></label>
+            <label>Search flights<input id="flightSearch" placeholder="MAN, MCO, Emirates, Dubai..." /></label>
+          </div>
+        </div>
+        <div id="flightSummary" class="travel-summary-grid"></div>
+        <div class="flight-layout">
+          <div class="card">
+            <h3>Flight route map</h3>
+            <p class="help-text">Routes appear when both airport codes have coordinates. Curved lines are visual guides, not exact flight tracks.</p>
+            <div id="flightRouteMap" class="travel-mini-map"></div>
+            <div id="flightMapStatus" class="help-text" style="margin-top:8px;"></div>
+          </div>
+          <div id="flightCards" class="travel-event-grid"></div>
+        </div>
+      </section>
+
       <section id="timeline" class="section timeline-section">
         <div class="hero timeline-hero">
           <div class="eyebrow">Adventure timeline</div>
@@ -1935,27 +2423,83 @@
             </label>
           </div>
         </div>
-        <div id="timelineHighlights" class="adventure-strip"></div>
+        <div id="timelineHighlights" class="timeline-summary-panel"></div>
         <div class="card timeline-year-jump-card">
           <h3>Jump to a year</h3>
           <div id="timelineYearJump" class="timeline-year-jump"></div>
         </div>
         <div id="timelineRail" class="timeline-rail"></div>
+      </section>
+
+      <section id="editTimeline" class="section timeline-admin-section">
+        <div class="hero">
+          <div class="eyebrow">Parent timeline tools</div>
+          <h2>Edit Seb's travel timeline.</h2>
+          <p>Review places that still need month/year context, then safely apply shared visit details in bulk. This keeps Seb's Timeline page clean and explore-first.</p>
+        </div>
+        <div class="notice warn">This area is for parent-managed timeline maintenance. The bulk visit workflow is the same guarded workflow as before, including preview and confirmation before changes are committed.</div>
         <div id="timelineUndated" class="card timeline-undated-card"></div>
+        <div class="card timeline-bulk-card">
+          <div class="timeline-bulk-head">
+            <div>
+              <h3>Bulk visit details</h3>
+              <p class="help-text">Select places above, or select filtered records, then add the same month, trip and travelling group to them together.</p>
+            </div>
+            <div class="timeline-select-row">
+              <span class="timeline-selected-count" id="timelineSelectedCount">0 selected</span>
+              <button class="mini-button" id="timelineSelectVisibleBtn" type="button">Select visible</button>
+              <button class="mini-button" id="timelineSelectUndatedBtn" type="button">Select no-date places</button>
+              <button class="mini-button" id="timelineClearSelectionBtn" type="button">Clear</button>
+            </div>
+          </div>
+          <div class="timeline-bulk-grid">
+            <label>Apply mode
+              <select id="timelineBulkMode">
+                <option value="fill_missing">Fill missing visit info only</option>
+                <option value="add_new">Add as a new visit</option>
+              </select>
+            </label>
+            <label>Visit month / year
+              <input id="timelineBulkPeriod" placeholder="2025-08 or August 2025" />
+            </label>
+            <label>Status
+              <select id="timelineBulkStatus">
+                <option value="completed">Completed</option>
+                <option value="planned">Planned</option>
+              </select>
+            </label>
+            <label>Trip context
+              <input id="timelineBulkTrip" placeholder="TL-021 Florida 2025" />
+            </label>
+            <label>Travelled with
+              <input id="timelineBulkVisitedBy" placeholder="Seb, Mummy, Daddy" value="Seb, Mummy, Daddy" />
+            </label>
+            <label>Notes
+              <input id="timelineBulkNotes" placeholder="Optional note" />
+            </label>
+          </div>
+          <div class="timeline-bulk-actions">
+            <button class="button secondary" id="timelinePreviewBulkBtn" type="button">Preview visit batch</button>
+            <input id="timelineBulkConfirm" placeholder="Type APPLY VISIT BATCH to commit" style="max-width:320px;" />
+            <button class="button" id="timelineCommitBulkBtn" type="button" disabled>Apply visit batch</button>
+          </div>
+          <div id="timelineBulkPreview" class="timeline-bulk-preview" style="display:none;"></div>
+        </div>
+
       </section>
 
       <section id="hierarchy" class="section map-experience-section">
         <div class="hero map-hero">
           <div class="eyebrow">Map & hierarchy</div>
           <h2>Explore Seb's world map.</h2>
-          <p>The map is now the main experience. It shows specific visited places first, while broader country, continent and cruise-ship records stay available as context rather than misleading centre-point pins.</p>
+          <p>Explore Seb's places on an interactive map, then follow how each adventure connects through towns, cities, countries and continents.</p>
         </div>
 
         <div class="card map-theatre-card">
           <div class="map-card-header">
             <div>
               <h3>Interactive adventure map</h3>
-              <p class="help-text">Click a pin to open a place card. The default view hides countries, continents, broad regions and cruise ships so Seb sees where he actually went, not misleading centre-point pins.</p>
+              <p class="help-text">Tap a pin to open its place card. Use the filters to explore different types of places.</p>
             </div>
             <button class="button secondary" id="mapSurpriseBtn" type="button">Surprise me on the map</button>
           </div>
@@ -1976,20 +2520,15 @@
           </div>
           <div id="mapStatus" class="map-status-line">Map will appear when enriched places include latitude and longitude.</div>
           <div id="mapLibreMap" class="maplibre-map maplibre-map-theatre" role="region" aria-label="Interactive MapLibre map of Seb's known places"></div>
-          <details id="offlineMapDetails" class="fallback-details">
-            <summary>Open offline fallback coordinate map</summary>
+          <details id="offlineMapDetails" class="fallback-details" hidden>
+            <summary>Emergency fallback coordinate map</summary>
             <div class="map-board">
               <div id="geoPinBoard" class="map-pin-list"></div>
             </div>
           </details>
         </div>
 
-        <div class="map-support-grid">
-          <div class="card hierarchy-coverage-card">
-            <h3>Hierarchy coverage</h3>
-            <p class="help-text">A quick guide to the geography layers currently represented in the almanac.</p>
-            <div id="hierarchyCoverage"></div>
-          </div>
+        <div class="map-support-grid map-support-grid-single">
           <div class="card map-guide-card">
             <h3>How to explore</h3>
             <div class="tip-list">
@@ -2003,7 +2542,7 @@
 
         <div class="card" style="margin-top:16px;">
           <h3>Adventure tree</h3>
-          <p class="help-text">Collapsed by default so Seb can choose each geography tier and open the journey step by step.</p>
+          <p class="help-text">Open each level to follow the journey from continent to place.</p>
           <div id="hierarchyTree"></div>
         </div>
       </section>
@@ -2050,7 +2589,6 @@
               <div class="toolbar">
                 <button class="button" id="resetQuizBtn">Reset score</button>
               </div>
-              <div class="quiz-safety-note" id="quizSafetyNote">Safe quiz mode is active.</div>
             </div>
             <div class="card">
               <h3>Question sources</h3>
@@ -2079,8 +2617,8 @@
             <div id="backupStatus" style="margin-top:14px;"></div>
           </div>
           <div class="card">
-            <h3>Prototype tools</h3>
-            <p class="help-text">Load a tiny demo, clear everything, or export diagnostics. These are included so the enrichment loop can be tested quickly.</p>
+            <h3>Advanced data tools</h3>
+            <p class="help-text">Manage demo data, reset the app, or export diagnostics when needed.</p>
             <div class="toolbar">
               <button class="button" id="loadDemoBtn">Load tiny demo</button>
               <button class="button warning" id="diagnosticsBtn">Export diagnostics</button>
@@ -2125,7 +2663,7 @@
 
   <script>
     const DB_NAME = 'sebs-adventure-almanac-v1';
-    const DB_VERSION = 1;
+    const DB_VERSION = 2;
     const STORE_PLACES = 'places';
     const STORE_META = 'meta';
     const LS_FALLBACK_KEY = 'sebs-adventure-almanac-fallback-v1';
@@ -2135,13 +2673,19 @@
       fallback: false,
       places: [],
       activeSection: 'dashboard',
+      activeNavKey: 'dashboard:',
+      travelEditorMode: 'holiday',
       queuedSelection: new Set(),
       pendingImport: null,
       importPlan: null,
       lastExport: null,
       quiz: { current: null, seen: 0, correct: 0 },
       guidedCapture: { step: 0, data: {} },
-      almanacShortcut: null
+      almanacShortcut: null,
+      timelineSelection: new Set(),
+      timelineBulkPreview: null,
+      travelEvents: [],
+      flightSegments: []
     };
     let mapLibreMap = null;
     let mapLibreMarkers = [];
@@ -2149,6 +2693,10 @@
     let mapLibreLoadPromise = null;
     let mapLibreProblem = null;
     let hiddenBroadMapCount = 0;
+    let cruiseMapLibreMap = null;
+    let cruiseMapMarkers = [];
+    let flightMapLibreMap = null;
+    let flightMapMarkers = [];
 
     const MAPLIBRE_VERSION = '5.6.2';
     const MAPLIBRE_CSS_URLS = [
@@ -2303,43 +2851,114 @@
       return type;
     }
 
+    function simpleHash(value) {
+      let hash = 0;
+      const text = String(value || '');
+      for (let i = 0; i < text.length; i += 1) {
+        hash = ((hash << 5) - hash) + text.charCodeAt(i);
+        hash |= 0;
+      }
+      return Math.abs(hash).toString(36);
+    }
+
+    function makeVisitId(place, ctx, index = 0) {
+      if (ctx?.visitId) return ctx.visitId;
+      const base = [place?.id || place?.canonicalName || 'place', ctx?.visitDateApprox || ctx?.period || '', ctx?.tripContext || '', ctx?.status || '', ctx?.notes || '', (ctx?.visitedBy || []).join(',')].join('|');
+      return `visit_${slugify(place?.id || place?.canonicalName || 'place')}_${simpleHash(base)}_${index + 1}`;
+    }
+
+    function normaliseVisitedBy(value, fallback = ['Seb']) {
+      if (Array.isArray(value)) return unique(value.map(v => String(v || '').trim()).filter(Boolean));
+      if (typeof value === 'string') return parseCsv(value);
+      return fallback;
+    }
+
+    function normaliseVisitContext(ctx, place, index = 0) {
+      const visitedBy = normaliseVisitedBy(ctx?.visitedBy, normaliseVisitedBy(place?.visitedBy, ['Seb']));
+      const visitDateApprox = normaliseVisitPeriod(ctx?.visitDateApprox || ctx?.period || '');
+      const normalised = {
+        visitId: ctx?.visitId || '',
+        visitLabel: ctx?.visitLabel || '',
+        visitDateApprox,
+        tripContext: String(ctx?.tripContext || '').trim(),
+        status: String(ctx?.status || place?.visitStatus || 'completed').trim() || 'completed',
+        visitedBy: visitedBy.length ? visitedBy : ['Seb'],
+        notes: String(ctx?.notes || '').trim()
+      };
+      normalised.visitId = makeVisitId(place, normalised, index);
+      return normalised;
+    }
+
+    function isEmptyVisitContext(ctx) {
+      return !(ctx?.visitDateApprox || ctx?.tripContext || ctx?.notes || (ctx?.visitedBy || []).length || ctx?.status === 'planned');
+    }
+
+    function uniqueVisitContexts(contexts, place = null) {
+      const seen = new Set();
+      return (contexts || [])
+        .map((ctx, index) => normaliseVisitContext(ctx, place, index))
+        .filter(ctx => !isEmptyVisitContext(ctx))
+        .filter(ctx => {
+          const key = [ctx.visitDateApprox, ctx.tripContext, ctx.status, (ctx.visitedBy || []).map(normalise).sort().join(','), ctx.notes].map(normalise).join('|');
+          if (!key.replace(/\|/g, '')) return false;
+          if (seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        })
+        .sort((a, b) => String(a.visitDateApprox || '9999').localeCompare(String(b.visitDateApprox || '9999')) || String(a.tripContext || '').localeCompare(String(b.tripContext || '')))
+        .map((ctx, index) => ({ ...ctx, visitId: makeVisitId(place, ctx, index), visitLabel: ordinalVisitLabel(index + 1) }));
+    }
+
     function baseVisitContextForPlace(place) {
       if (!place) return null;
       if (!place.visitDateApprox && !place.tripContext && !place.notes && !(place.visitedBy || []).length) return null;
-      return {
+      return normaliseVisitContext({
         visitLabel: 'First visit',
-        visitDateApprox: normaliseVisitPeriod(place.visitDateApprox || ''),
+        visitDateApprox: place.visitDateApprox || '',
         tripContext: place.tripContext || '',
         status: place.visitStatus || 'completed',
         visitedBy: place.visitedBy || ['Seb'],
         notes: place.notes || ''
-      };
+      }, place, 0);
     }
 
     function visitContextsArray(place) {
-      const contexts = Array.isArray(place?.visitContexts) ? place.visitContexts.map(ctx => ({ ...ctx, visitDateApprox: normaliseVisitPeriod(ctx.visitDateApprox || ctx.period || '') })) : [];
-      if (contexts.length) return contexts.map((ctx, index) => ({ ...ctx, visitLabel: ctx.visitLabel || ordinalVisitLabel(index + 1) }));
+      const supplied = Array.isArray(place?.visitContexts) ? place.visitContexts : [];
+      const contexts = uniqueVisitContexts(supplied, place);
+      if (contexts.length) return contexts;
       const base = baseVisitContextForPlace(place);
-      return base ? [base] : [];
+      return base ? uniqueVisitContexts([base], place) : [];
+    }
+
+    function withNormalisedVisitContexts(place) {
+      const contexts = visitContextsArray(place);
+      const first = contexts[0] || null;
+      return {
+        ...place,
+        visitDateApprox: place.visitDateApprox || first?.visitDateApprox || '',
+        tripContext: place.tripContext || first?.tripContext || '',
+        visitedBy: normaliseVisitedBy(place.visitedBy, first?.visitedBy || ['Seb']),
+        visitContexts: contexts
+      };
     }
 
     function appendVisitContext(place, visit) {
       const contexts = visitContextsArray(place);
-      const next = {
-        visitLabel: visit.visitLabel || ordinalVisitLabel(contexts.length + 1),
-        visitDateApprox: normaliseVisitPeriod(visit.visitDateApprox || ''),
+      const next = normaliseVisitContext({
+        visitDateApprox: visit.visitDateApprox || '',
         tripContext: visit.tripContext || '',
         status: visit.status || 'completed',
         visitedBy: visit.visitedBy?.length ? visit.visitedBy : (place.visitedBy || ['Seb']),
         notes: visit.notes || ''
-      };
-      contexts.push(next);
+      }, place, contexts.length);
+      const merged = uniqueVisitContexts([...contexts, next], place);
+      const first = merged[0] || next;
       return {
         ...place,
-        visitDateApprox: place.visitDateApprox || next.visitDateApprox || '',
-        tripContext: place.tripContext || next.tripContext || '',
-        visitedBy: place.visitedBy?.length ? place.visitedBy : next.visitedBy,
-        visitContexts: contexts.map((ctx, index) => ({ ...ctx, visitLabel: ctx.visitLabel || ordinalVisitLabel(index + 1) })),
+        visitDateApprox: place.visitDateApprox || first.visitDateApprox || '',
+        tripContext: place.tripContext || first.tripContext || '',
+        visitedBy: place.visitedBy?.length ? place.visitedBy : first.visitedBy,
+        visitContexts: merged,
         updatedAt: nowIso()
       };
     }
@@ -2419,7 +3038,7 @@
 
     function fallbackLoad() {
       try {
-        return JSON.parse(localStorage.getItem(LS_FALLBACK_KEY) || '{"places":[]}');
+        return JSON.parse(localStorage.getItem(LS_FALLBACK_KEY) || '{"places":[],"meta":{}}');
       } catch {
         return { places: [] };
       }
@@ -2486,11 +3105,59 @@
       });
     }
 
+
+
+    async function getMetaValue(key, fallbackValue = null) {
+      if (state.fallback) {
+        const data = fallbackLoad();
+        return data.meta && Object.prototype.hasOwnProperty.call(data.meta, key) ? data.meta[key] : fallbackValue;
+      }
+      return new Promise((resolve, reject) => {
+        const tx = state.db.transaction(STORE_META, 'readonly');
+        const req = tx.objectStore(STORE_META).get(key);
+        req.onerror = () => reject(req.error);
+        req.onsuccess = () => resolve(req.result ? req.result.value : fallbackValue);
+      });
+    }
+
+    async function putMetaValue(key, value) {
+      if (state.fallback) {
+        const data = fallbackLoad();
+        data.meta = data.meta || {};
+        data.meta[key] = value;
+        fallbackSaveData(data);
+        return;
+      }
+      return new Promise((resolve, reject) => {
+        const tx = state.db.transaction(STORE_META, 'readwrite');
+        const req = tx.objectStore(STORE_META).put({ key, value });
+        req.onerror = () => reject(req.error);
+        tx.oncomplete = () => resolve();
+      });
+    }
+
+    async function clearMetaValues() {
+      if (state.fallback) {
+        const data = fallbackLoad();
+        data.meta = {};
+        fallbackSaveData(data);
+        return;
+      }
+      return new Promise((resolve, reject) => {
+        const tx = state.db.transaction(STORE_META, 'readwrite');
+        const req = tx.objectStore(STORE_META).clear();
+        req.onerror = () => reject(req.error);
+        tx.oncomplete = () => resolve();
+      });
+    }
+
     async function migrateLoadedPlacesIfNeeded() {
       const updates = [];
       state.places.forEach(place => {
         const nextType = normalisePlaceTypeForImport(place, place);
-        if (nextType !== (place.placeType || 'unknown')) updates.push({ ...place, placeType: nextType, updatedAt: nowIso() });
+        const normalised = withNormalisedVisitContexts({ ...place, placeType: nextType });
+        const changed = nextType !== (place.placeType || 'unknown') || JSON.stringify(normalised.visitContexts || []) !== JSON.stringify(place.visitContexts || []);
+        if (changed) updates.push({ ...normalised, updatedAt: place.updatedAt || nowIso() });
       });
       if (updates.length) {
         await putPlaces(updates);
@@ -2501,6 +3168,8 @@
 
     async function refreshState() {
       state.places = await getAllPlaces();
+      state.travelEvents = Array.isArray(await getMetaValue('travelEvents', [])) ? await getMetaValue('travelEvents', []) : [];
+      state.flightSegments = Array.isArray(await getMetaValue('flightSegments', [])) ? await getMetaValue('flightSegments', []) : [];
       await migrateLoadedPlacesIfNeeded();
       state.places.sort((a, b) => String(b.updatedAt || '').localeCompare(String(a.updatedAt || '')));
       renderAll();
@@ -2793,17 +3462,29 @@
           accuracyRule: 'Do not invent personal memories. Only use supplied personal context as visit context. Mark uncertainty in notesForReview.',
           timePrecisionRule: 'Treat visit timing as month/year-level context only. Do not create day-by-day chronology or infer exact visit dates.'
         },
-        placesForEnrichment: selected.map(p => ({
-          localPlaceId: p.id,
-          enteredName: p.enteredName || p.displayName || p.canonicalName,
-          currentCanonicalName: p.canonicalName || p.enteredName,
-          placeTypeHint: p.placeType || 'unknown',
-          tripContext: p.tripContext || '',
-          visitDateApprox: normaliseVisitPeriod(p.visitDateApprox || ''),
-          visitedBy: p.visitedBy || ['Seb'],
-          notes: p.notes || '',
-          refreshRequested: !!p.needsRefresh
-        }))
+        placesForEnrichment: selected.map(p => {
+          const visits = visitContextsArray(p);
+          return {
+            localPlaceId: p.id,
+            enteredName: p.enteredName || p.displayName || p.canonicalName,
+            currentCanonicalName: p.canonicalName || p.enteredName,
+            placeTypeHint: p.placeType || 'unknown',
+            tripContext: p.tripContext || '',
+            visitDateApprox: normaliseVisitPeriod(p.visitDateApprox || visits[0]?.visitDateApprox || ''),
+            visitedBy: p.visitedBy || visits[0]?.visitedBy || ['Seb'],
+            visitContexts: visits.map(ctx => ({
+              visitId: ctx.visitId,
+              visitLabel: ctx.visitLabel,
+              visitDateApprox: ctx.visitDateApprox || '',
+              tripContext: ctx.tripContext || '',
+              status: ctx.status || 'completed',
+              visitedBy: ctx.visitedBy || ['Seb'],
+              notes: ctx.notes || ''
+            })),
+            notes: p.notes || '',
+            refreshRequested: !!p.needsRefresh
+          };
+        })
       };
     }
 
@@ -2829,7 +3510,7 @@ Critical rules:
 4. Where a place has hierarchy, include the hierarchy levels as separate place objects too. For example, Magic Kingdom should also cause separate enriched records for Bay Lake, Florida, United States of America and North America, provided the facts are reliable.
 5. Do not invent personal memories. Use supplied visit notes only as personal context.
 6. Treat visit timing as month/year-level context only. Do not create day-by-day chronology, and do not infer precise visit days.
-7. Preserve supplied tripContext, visitDateApprox and planned/completed status where provided. If a place appears in multiple supplied trips, use visitContexts as an array of month/year-level visit contexts.
+7. Preserve supplied tripContext, visitDateApprox, visitContexts, visitedBy and planned/completed status where provided. If visitContexts are supplied, keep each visit as a separate month/year-level context. Do not collapse repeat visits into one date.
 8. Include sources for factual claims. Prefer official sources, encyclopaedic sources, government/tourism sources, reputable museums or reliable reference sites.
 9. Keep the child-facing explanation warm, clear and factual. Avoid babyish language.
 10. Include quiz questions with answers.
@@ -2855,7 +3536,7 @@ Required JSON shape:
       "tripContext": "Copy supplied trip context where relevant",
       "visitDateApprox": "YYYY-MM where supplied or reliably known from the export",
       "visitContexts": [
-        { "tripContext": "TL-001 example", "visitDateApprox": "2019-09", "status": "completed" }
+        { "visitId": "preserve supplied id if provided", "visitLabel": "First visit", "tripContext": "TL-001 example", "visitDateApprox": "2019-09", "status": "completed", "visitedBy": ["Seb", "Mummy", "Daddy"], "notes": "optional supplied visit note" }
       ],
       "almanac": {
         "oneSentenceSummary": "Short summary",
@@ -3080,23 +3761,6 @@ Required JSON shape:
       }
     }
 
-    function uniqueVisitContexts(contexts) {
-      const seen = new Set();
-      return (contexts || []).map(ctx => ({
-        ...ctx,
-        visitDateApprox: normaliseVisitPeriod(ctx.visitDateApprox || ctx.period || ''),
-        tripContext: ctx.tripContext || '',
-        status: ctx.status || 'completed',
-        notes: ctx.notes || ''
-      })).filter(ctx => {
-        const key = [ctx.visitDateApprox, ctx.tripContext, ctx.status, ctx.notes].map(normalise).join('|');
-        if (!key.replace(/\|/g, '')) return false;
-        if (seen.has(key)) return false;
-        seen.add(key);
-        return true;
-      }).map((ctx, index) => ({ ...ctx, visitLabel: ctx.visitLabel || ordinalVisitLabel(index + 1) }));
-    }
-
     function renderImportPreviewTable(plan) {
       if (!plan?.length) return `<div class="empty-state"><span class="big">📥</span>No import records to preview.</div>`;
       return `<table><thead><tr><th>Action</th><th>Place</th><th>Type</th><th>Hierarchy</th><th>Sources</th><th>Match</th></tr></thead><tbody>${plan.map(row => {
@@ -3129,7 +3793,11 @@ Required JSON shape:
         needsRefresh: false,
         tripContext: existing?.tripContext || item.tripContext || '',
         visitDateApprox: normaliseVisitPeriod(existing?.visitDateApprox || item.visitDateApprox || ''),
-        visitContexts: uniqueVisitContexts([...(existing?.visitContexts || []), ...(Array.isArray(item.visitContexts) ? item.visitContexts : [])]),
+        visitContexts: uniqueVisitContexts([
+          ...(visitContextsArray(existing) || []),
+          ...(Array.isArray(item.visitContexts) ? item.visitContexts : []),
+          ...((item.visitDateApprox || item.tripContext || item.notes || item.visitedBy) ? [{ visitDateApprox: item.visitDateApprox || '', tripContext: item.tripContext || '', status: item.visitStatus || item.status || 'completed', visitedBy: item.visitedBy || ['Seb'], notes: item.notes || '' }] : [])
+        ], existing || item),
         visitedBy: existing?.visitedBy || item.visitedBy || ['Seb'],
         notes: existing?.notes || '',
         hierarchy: Array.isArray(item.hierarchy) ? item.hierarchy : [],
@@ -3550,12 +4218,15 @@ Required JSON shape:
       const el = document.getElementById('mapStatus');
       if (!el) return;
       el.className = `map-status-line${tone ? ` ${tone}` : ''}`;
-      el.textContent = message;
+      el.textContent = message || '';
+      el.hidden = !message;
     }
 
     function setOfflineFallbackOpen(open) {
       const details = document.getElementById('offlineMapDetails');
-      if (details) details.open = Boolean(open);
+      if (!details) return;
+      details.hidden = !open;
+      details.open = Boolean(open);
     }
 
     function showMapDiagnostic(tone, title, message, details = []) {
@@ -3563,7 +4234,7 @@ Required JSON shape:
       if (!mapEl) return;
       setMapStatus(`${title}: ${message}`, tone);
       const detailList = details.length ? `<ul>${details.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>` : '';
-      mapEl.innerHTML = `<div class="map-diagnostic"><div class="map-diagnostic-card"><h4>${escapeHtml(title)}</h4><p>${escapeHtml(message)}</p>${detailList}<p style="margin-top:12px;"><strong>The offline coordinate map below is still available.</strong></p></div></div>`;
+      mapEl.innerHTML = `<div class="map-diagnostic"><div class="map-diagnostic-card"><h4>${escapeHtml(title)}</h4><p>${escapeHtml(message)}</p>${detailList}<p style="margin-top:12px;"><strong>An emergency fallback map has been opened underneath.</strong></p></div></div>`;
       setOfflineFallbackOpen(true);
     }
 
@@ -3717,7 +4388,7 @@ Required JSON shape:
         showMapDiagnostic('danger', 'MapLibre did not load', mapLibreProblem || 'The interactive map library is unavailable.', [
           'This can happen if the app is opened offline, if the browser blocks CDN scripts, or if a corporate/network filter blocks map assets.',
           'The almanac data has not been affected.',
-          'Use the offline coordinate map below while testing, or try again from an online browser session.'
+          'Try again from an online browser session, or use the emergency fallback map that opens underneath.'
         ]);
         return false;
       }
@@ -3737,7 +4408,7 @@ Required JSON shape:
           mapLibreMap.addControl(new maplibregl.FullscreenControl(), 'top-left');
           mapLibreMap.on('error', event => {
             const message = event?.error?.message || 'A map style or tile request failed.';
-            setMapStatus(`MapLibre loaded, but a map resource reported a problem: ${message}. The offline fallback remains available.`, 'warn');
+            setMapStatus(`The map loaded, but a map resource reported a problem: ${message}. An emergency fallback map is available.`, 'warn');
             setOfflineFallbackOpen(true);
           });
           await new Promise((resolve, reject) => {
@@ -3784,14 +4455,14 @@ Required JSON shape:
         } else {
           mapLibreMap.fitBounds(bounds, { padding: 54, maxZoom: 8, duration: 700 });
         }
-        setMapStatus(`MapLibre is working. ${places.length} mapped place${places.length === 1 ? '' : 's'} shown. Click a pin to open its place card. The offline fallback is preserved below.${mapScopeStatusSuffix()}`, 'ok');
+        setMapStatus('', 'ok');
         setOfflineFallbackOpen(false);
         setTimeout(() => mapLibreMap.resize(), 120);
         return true;
       } catch (err) {
         showMapDiagnostic('danger', 'MapLibre map failed after loading', err?.message || 'The map library loaded but could not initialise the map.', [
           'This usually points to blocked map tiles, WebGL/GPU restrictions, or browser security behaviour when opening a local HTML file.',
-          'The v0.5 offline coordinate map remains available below.',
+          'An emergency fallback coordinate map opens underneath if the richer map cannot load.',
           'A hosted static/PWA deployment would be the next test if this fails locally.'
         ]);
         try { if (mapLibreMap) mapLibreMap.remove(); } catch (removeErr) { /* ignore */ }
@@ -3809,7 +4480,7 @@ Required JSON shape:
       renderMapFilters(allMapped);
       const withGeo = filteredMappedPlaces(allMapped);
       if (!allMapped.length) {
-        showMapDiagnostic('warn', 'No coordinates yet', 'Imported places with latitude and longitude will appear on the richer map and the offline fallback map.');
+        showMapDiagnostic('warn', 'No coordinates yet', 'Imported places with latitude and longitude will appear on the map.');
         el.innerHTML = `<div class="empty-state"><span class="big">📍</span>No coordinates yet. Imported places with latitude and longitude will appear here.</div>`;
         return;
       }
@@ -4218,6 +4889,7 @@ Required JSON shape:
             tripContext: ctx.tripContext,
             status: ctx.status,
             notes: ctx.notes,
+            visitLabel: ctx.visitLabel,
             inferred: ctx.inferred
           };
           if (ctx.period) entries.push(entry);
@@ -4265,6 +4937,150 @@ Required JSON shape:
       return { entries, undated };
     }
 
+    function filteredTimelinePlaceIds({ includeEntries = true, includeUndated = true } = {}) {
+      const { entries, undated } = filteredTimelineEntries();
+      const ids = new Set();
+      if (includeEntries) entries.forEach(e => ids.add(e.place.id));
+      if (includeUndated) undated.forEach(e => ids.add(e.place.id));
+      return ids;
+    }
+
+    function updateTimelineSelectionCount() {
+      const el = document.getElementById('timelineSelectedCount');
+      if (el) el.textContent = `${state.timelineSelection.size} selected`;
+      document.querySelectorAll('.timeline-select-check').forEach(box => {
+        box.checked = state.timelineSelection.has(box.dataset.timelineSelect);
+      });
+    }
+
+    function clearTimelineBulkPreview() {
+      state.timelineBulkPreview = null;
+      const preview = document.getElementById('timelineBulkPreview');
+      if (preview) {
+        preview.style.display = 'none';
+        preview.innerHTML = '';
+      }
+      const confirm = document.getElementById('timelineBulkConfirm');
+      if (confirm) confirm.value = '';
+      const commit = document.getElementById('timelineCommitBulkBtn');
+      if (commit) commit.disabled = true;
+    }
+
+    function selectTimelineIds(ids) {
+      state.timelineSelection = new Set([...ids].filter(id => state.places.some(p => p.id === id)));
+      clearTimelineBulkPreview();
+      updateTimelineSelectionCount();
+      renderTimeline();
+    }
+
+    function timelineBulkOptionsFromForm() {
+      const periodRaw = document.getElementById('timelineBulkPeriod')?.value || '';
+      const period = normaliseVisitPeriod(periodRaw);
+      const mode = document.getElementById('timelineBulkMode')?.value || 'fill_missing';
+      const status = document.getElementById('timelineBulkStatus')?.value || 'completed';
+      const tripContext = (document.getElementById('timelineBulkTrip')?.value || '').trim();
+      const visitedBy = parseCsv(document.getElementById('timelineBulkVisitedBy')?.value || 'Seb, Mummy, Daddy');
+      const notes = (document.getElementById('timelineBulkNotes')?.value || '').trim();
+      return { mode, visitDateApprox: period, status, tripContext, visitedBy: visitedBy.length ? visitedBy : ['Seb'], notes };
+    }
+
+    function applyBulkVisitToPlace(place, opts, dryRun = true) {
+      const contexts = visitContextsArray(place);
+      if (opts.mode === 'fill_missing') {
+        const dated = contexts.some(ctx => !!ctx.visitDateApprox);
+        if (dated) return { action: 'skip', reason: 'Already has month/year', place };
+        if (contexts.length) {
+          const updatedContexts = contexts.map((ctx, index) => index === 0 ? {
+            ...ctx,
+            visitDateApprox: opts.visitDateApprox || ctx.visitDateApprox,
+            tripContext: opts.tripContext || ctx.tripContext,
+            status: opts.status || ctx.status || 'completed',
+            visitedBy: opts.visitedBy?.length ? opts.visitedBy : (ctx.visitedBy || ['Seb']),
+            notes: opts.notes || ctx.notes || ''
+          } : ctx);
+          const updated = withNormalisedVisitContexts({ ...place, visitContexts: uniqueVisitContexts(updatedContexts, place), updatedAt: nowIso() });
+          return { action: 'update', reason: 'Filled missing month/year', place: updated };
+        }
+        return { action: 'add', reason: 'Created first visit context', place: appendVisitContext(place, opts) };
+      }
+      const before = contexts.length;
+      const updated = appendVisitContext(place, opts);
+      const after = visitContextsArray(updated).length;
+      if (after === before) return { action: 'skip', reason: 'Matching visit already exists', place };
+      return { action: 'add', reason: 'Added new visit', place: updated };
+    }
+
+    function buildTimelineBulkPreview() {
+      const opts = timelineBulkOptionsFromForm();
+      if (!state.timelineSelection.size) throw new Error('Select at least one place first.');
+      if (!/^(19|20)\d{2}(-\d{2})?$/.test(opts.visitDateApprox)) throw new Error('Enter a valid year or month/year, for example 2025-08 or August 2025.');
+      const rows = [...state.timelineSelection].map(id => {
+        const place = state.places.find(p => p.id === id);
+        if (!place) return null;
+        const result = applyBulkVisitToPlace(place, opts, true);
+        return { id, placeName: placeDisplayName(place), type: typeLabel(place.placeType), result };
+      }).filter(Boolean);
+      return { opts, rows };
+    }
+
+    function renderTimelineBulkPreview(previewData) {
+      const el = document.getElementById('timelineBulkPreview');
+      if (!el) return;
+      const addCount = previewData.rows.filter(r => r.result.action === 'add').length;
+      const updateCount = previewData.rows.filter(r => r.result.action === 'update').length;
+      const skipCount = previewData.rows.filter(r => r.result.action === 'skip').length;
+      el.style.display = 'block';
+      el.innerHTML = `<h3>Visit batch preview</h3>
+        <p class="help-text">This will add or fill ${escapeHtml(formatDate(previewData.opts.visitDateApprox) || previewData.opts.visitDateApprox)} visit details for selected places. No place records will be deleted.</p>
+        <div class="status-row">
+          <span class="tag known">${addCount} new visit${addCount === 1 ? '' : 's'}</span>
+          <span class="tag type">${updateCount} filled record${updateCount === 1 ? '' : 's'}</span>
+          <span class="tag">${skipCount} skipped</span>
+        </div>
+        <table style="margin-top:12px;"><thead><tr><th>Place</th><th>Type</th><th>Action</th><th>Reason</th></tr></thead><tbody>
+          ${previewData.rows.map(row => `<tr><td>${escapeHtml(row.placeName)}</td><td>${escapeHtml(row.type)}</td><td>${escapeHtml(row.result.action)}</td><td>${escapeHtml(row.result.reason)}</td></tr>`).join('')}
+        </tbody></table>
+        <p class="help-text">Type <strong>APPLY VISIT BATCH</strong> to commit these changes.</p>`;
+    }
+
+    function previewTimelineBulkVisit() {
+      try {
+        const previewData = buildTimelineBulkPreview();
+        state.timelineBulkPreview = previewData;
+        renderTimelineBulkPreview(previewData);
+        const commit = document.getElementById('timelineCommitBulkBtn');
+        const confirm = document.getElementById('timelineBulkConfirm');
+        if (commit) commit.disabled = (confirm?.value || '').trim() !== 'APPLY VISIT BATCH';
+      } catch (err) {
+        clearTimelineBulkPreview();
+        toast(err.message || 'Could not preview visit batch.');
+      }
+    }
+
+    async function commitTimelineBulkVisit() {
+      if (!state.timelineBulkPreview) {
+        toast('Preview the visit batch before applying it.');
+        return;
+      }
+      const confirm = (document.getElementById('timelineBulkConfirm')?.value || '').trim();
+      if (confirm !== 'APPLY VISIT BATCH') {
+        toast('Type APPLY VISIT BATCH to confirm.');
+        return;
+      }
+      const updates = state.timelineBulkPreview.rows
+        .filter(row => row.result.action === 'add' || row.result.action === 'update')
+        .map(row => row.result.place);
+      if (!updates.length) {
+        toast('No visit records needed updating.');
+        return;
+      }
+      await putPlaces(updates);
+      state.timelineSelection.clear();
+      clearTimelineBulkPreview();
+      await refreshState();
+      toast(`Applied visit details to ${updates.length} place${updates.length === 1 ? '' : 's'}.`);
+    }
+
     function renderTimelineFilters(allEntries) {
       const typeSelect = document.getElementById('timelineTypeFilter');
       if (!typeSelect) return;
@@ -4287,22 +5103,35 @@ Required JSON shape:
       const months = unique(entries.map(e => e.period.period)).length;
       const first = entries.length ? entries.reduce((a,b) => a.period.period < b.period.period ? a : b) : null;
       const latest = entries.length ? entries.reduce((a,b) => a.period.period > b.period.period ? a : b) : null;
-      const cards = [
+      const metrics = [
         ['🗓️', entries.length, 'Timeline entries'],
         ['📆', months, 'Months with places'],
         ['⏳', years, 'Years represented'],
-        ['🧭', undated.length, 'Need month/year'],
-        ['👶', first ? timelinePeriodLabel(first.period) : '—', 'First timeline point'],
-        ['🚀', latest ? timelinePeriodLabel(latest.period) : '—', 'Latest timeline point']
+        ['🧭', undated.length, 'Need month/year']
       ];
-      el.innerHTML = cards.map(([icon, value, label]) => `<div class="highlight-card"><span>${icon}</span><strong>${escapeHtml(value)}</strong><em>${escapeHtml(label)}</em></div>`).join('');
+      const startLabel = first ? timelinePeriodLabel(first.period) : 'No dated visits yet';
+      const endLabel = latest ? timelinePeriodLabel(latest.period) : 'No dated visits yet';
+      el.className = 'timeline-summary-panel';
+      el.innerHTML = `
+        <div class="timeline-metric-row">
+          ${metrics.map(([icon, value, label]) => `<div class="timeline-metric-card"><span>${icon}</span><strong>${escapeHtml(value)}</strong><em>${escapeHtml(label)}</em></div>`).join('')}
+        </div>
+        <div class="timeline-range-card">
+          <div class="timeline-range-label">Timeline span</div>
+          <div class="timeline-range-track">
+            <div class="timeline-point"><strong>${escapeHtml(startLabel)}</strong><em>Start</em></div>
+            <div class="timeline-line" aria-hidden="true"></div>
+            <div class="timeline-point"><strong>${escapeHtml(endLabel)}</strong><em>Latest</em></div>
+          </div>
+        </div>
+      `;
     }
 
     function renderTimelinePlaceCard(entry) {
       const p = entry.place;
       const summary = p.almanac?.oneSentenceSummary || p.notes || entry.tripContext || 'Captured in Seb\'s travel almanac.';
       const planned = /planned/i.test([entry.status, entry.tripContext, entry.notes, p.tripContext, p.notes].join(' '));
-      return `<article class="timeline-place-card">
+      return `<article class="timeline-place-card" data-open-place="${escapeHtml(p.id)}" role="button" tabindex="0" aria-label="Open ${escapeHtml(placeDisplayName(p))}">
         <div class="timeline-place-top">
           <span class="mini-icon">${typeIcon(p.placeType)}</span>
           <div>
@@ -4316,7 +5145,6 @@ Required JSON shape:
           ${entry.inferred ? `<span class="tag">Month inferred</span>` : ''}
           ${p.sources?.length ? `<span class="tag">${p.sources.length} source${p.sources.length === 1 ? '' : 's'}</span>` : ''}
         </div>
-        <div class="toolbar"><button class="mini-button" data-open-place="${escapeHtml(p.id)}">Open place</button></div>
       </article>`;
     }
 
@@ -4353,7 +5181,7 @@ Required JSON shape:
       renderTimelineYearJump(grouped);
       const rail = document.getElementById('timelineRail');
       if (!sorted.length) {
-        rail.innerHTML = `<div class="empty-state"><span class="big">🗓️</span>No month/year timeline entries match this view yet. Places without usable month/year are listed below.</div>`;
+        rail.innerHTML = `<div class="empty-state"><span class="big">🗓️</span>No month/year timeline entries match this view yet. Parent timeline maintenance lives under Manage, Edit Timeline.</div>`;
       } else {
         rail.innerHTML = [...grouped.entries()].map(([year, months]) => {
           const yearCount = [...months.values()].reduce((sum, arr) => sum + arr.length, 0);
@@ -4369,13 +5197,23 @@ Required JSON shape:
           </section>`;
         }).join('');
       }
+    }
+
+    function renderTimelineAdmin() {
       const undatedEl = document.getElementById('timelineUndated');
       if (!undatedEl) return;
+      const { undated } = filteredTimelineEntries();
       if (!undated.length) {
         undatedEl.innerHTML = `<h3>Places without month/year</h3><p class="help-text">Every place in this filtered view has timeline context.</p>`;
       } else {
-        undatedEl.innerHTML = `<h3>Places without month/year</h3><p class="help-text">These places are still useful in the almanac, but they need a month/year before they can sit confidently on Seb's timeline.</p><div class="timeline-undated-grid">${undated.slice(0, 60).map(e => `<div class="place-row" style="grid-template-columns:1fr auto;"><div><div class="place-title">${escapeHtml(placeDisplayName(e.place))}</div><div class="place-subtitle">${escapeHtml(typeLabel(e.place.placeType))}${e.place.tripContext ? ` · ${escapeHtml(e.place.tripContext)}` : ''}</div></div><div class="toolbar"><button class="mini-button" data-open-place="${escapeHtml(e.place.id)}">Open</button><button class="mini-button" data-add-visit="${escapeHtml(e.place.id)}">Add visit</button></div></div>`).join('')}</div>${undated.length > 60 ? `<p class="help-text">Showing the first 60 of ${undated.length} undated records.</p>` : ''}`;
+        undatedEl.innerHTML = `<h3>Places without month/year</h3><p class="help-text">These places are still useful in the almanac, but they need a month/year before they can sit confidently on Seb's timeline.</p><div class="timeline-undated-grid">${undated.slice(0, 60).map(e => `<div class="place-row" style="grid-template-columns:auto 1fr auto;"><input class="timeline-select-check" type="checkbox" data-timeline-select="${escapeHtml(e.place.id)}" ${state.timelineSelection.has(e.place.id) ? 'checked' : ''} aria-label="Select ${escapeHtml(placeDisplayName(e.place))}" /><div><div class="place-title">${escapeHtml(placeDisplayName(e.place))}</div><div class="place-subtitle">${escapeHtml(typeLabel(e.place.placeType))}${e.place.tripContext ? ` · ${escapeHtml(e.place.tripContext)}` : ''}</div></div><div class="toolbar"><button class="mini-button" data-open-place="${escapeHtml(e.place.id)}">Open</button><button class="mini-button" data-add-visit="${escapeHtml(e.place.id)}">Add visit</button></div></div>`).join('')}</div>${undated.length > 60 ? `<p class="help-text">Showing the first 60 of ${undated.length} undated records.</p>` : ''}`;
       }
+      updateTimelineSelectionCount();
+    }
+
+    function renderTimelineViews() {
+      renderTimeline();
+      renderTimelineAdmin();
     }
 
     function renderHierarchy() {
@@ -4385,15 +5223,16 @@ Required JSON shape:
       const known = state.places.filter(p => p.known);
       if (!known.length) {
         treeEl.innerHTML = `<div class="empty-state"><span class="big">🌳</span>Hierarchy appears after enrichment imports.</div>`;
-        coverageEl.innerHTML = `<div class="empty-state"><span class="big">📌</span>No known places yet.</div>`;
+        if (coverageEl) coverageEl.innerHTML = `<div class="empty-state"><span class="big">📌</span>No known places yet.</div>`;
         return;
       }
       const roots = new Map();
       for (const place of known) {
         const chain = [...(place.hierarchy || [])].reverse();
         if (!chain.length) {
-          const rootName = place.displayName || place.canonicalName;
-          if (!roots.has(rootName)) roots.set(rootName, { name: rootName, type: place.placeType, children: new Map(), placeId: place.id });
+          const key = `${place.placeType || 'unknown'}:${normalise(place.canonicalName || place.displayName)}`;
+          if (!roots.has(key)) roots.set(key, { name: place.displayName || place.canonicalName, type: place.placeType || 'unknown', children: new Map(), placeId: place.id });
+          else if (!roots.get(key).placeId) roots.get(key).placeId = place.id;
           continue;
         }
         let currentMap = roots;
@@ -4404,33 +5243,314 @@ Required JSON shape:
         }
         const selfKey = `${place.placeType || 'unknown'}:${normalise(place.canonicalName)}`;
         if (!currentMap.has(selfKey)) currentMap.set(selfKey, { name: place.displayName || place.canonicalName, type: place.placeType || 'unknown', children: new Map(), placeId: place.id });
+        else if (!currentMap.get(selfKey).placeId) currentMap.get(selfKey).placeId = place.id;
       }
       function renderNodes(map, depth = 0) {
-        return [...map.values()].sort((a,b) => a.name.localeCompare(b.name)).map(node => {
-          const childHtml = node.children.size ? `<div class="tree-children">${renderNodes(node.children, depth + 1)}</div>` : '';
-          const opener = depth === 0 ? '' : '';
-          return `<details class="tree-details" ${opener}>
-            <summary><span>${typeIcon(node.type)}</span><span><strong>${escapeHtml(node.name)}</strong><div class="small">${escapeHtml(typeLabel(node.type))}${node.children.size ? ` · ${node.children.size} inside` : ''}</div></span></summary>
-            ${childHtml || (node.placeId ? `<div class="tree-children"><button class="mini-button" data-open-place="${escapeHtml(node.placeId)}">Open place</button></div>` : '')}
-          </details>`;
-        }).join('');
+        return [...map.values()]
+          .filter(node => !(depth === 0 && !node.children.size))
+          .sort((a,b) => a.name.localeCompare(b.name))
+          .map(node => {
+            const childHtml = node.children.size ? `<div class="tree-children">${renderNodes(node.children, depth + 1)}</div>` : '';
+            const openButton = node.placeId ? `<div class="tree-children"><button class="mini-button" data-open-place="${escapeHtml(node.placeId)}">Open ${escapeHtml(typeLabel(node.type)).toLowerCase()}</button></div>` : '';
+            return `<details class="tree-details">
+              <summary><span>${typeIcon(node.type)}</span><span><strong>${escapeHtml(node.name)}</strong><div class="small">${escapeHtml(typeLabel(node.type))}${node.children.size ? ` · ${node.children.size} inside` : ''}</div></span></summary>
+              ${childHtml}${openButton}
+            </details>`;
+          }).join('');
       }
-      treeEl.innerHTML = `<div class="hierarchy">${renderNodes(roots)}</div>`;
+      const treeHtml = renderNodes(roots);
+      treeEl.innerHTML = treeHtml ? `<div class="hierarchy">${treeHtml}</div>` : `<div class="empty-state"><span class="big">🌳</span>No connected hierarchy tiers are available for this view yet.</div>`;
 
-      const withHierarchy = known.filter(p => p.hierarchy?.length).length;
-      const withGeo = known.filter(p => p.geo && typeof p.geo.latitude === 'number' && typeof p.geo.longitude === 'number').length;
-      const withQuiz = known.filter(p => p.almanac?.quizQuestions?.length).length;
-      coverageEl.innerHTML = `<div class="list">
-        <div class="place-row" style="grid-template-columns: 1fr auto;"><div><div class="place-title">Known places</div><div class="place-subtitle">Imported or manually marked as known</div></div><span class="tag known">${known.length}</span></div>
-        <div class="place-row" style="grid-template-columns: 1fr auto;"><div><div class="place-title">With hierarchy</div><div class="place-subtitle">Places that know where they fit</div></div><span class="tag type">${withHierarchy}</span></div>
-        <div class="place-row" style="grid-template-columns: 1fr auto;"><div><div class="place-title">With coordinates</div><div class="place-subtitle">Ready for a future map view</div></div><span class="tag type">${withGeo}</span></div>
-        <div class="place-row" style="grid-template-columns: 1fr auto;"><div><div class="place-title">With quiz questions</div><div class="place-subtitle">Ready for Seb mode</div></div><span class="tag type">${withQuiz}</span></div>
-      </div>`;
+      if (coverageEl) {
+        const withHierarchy = known.filter(p => p.hierarchy?.length).length;
+        const withGeo = known.filter(p => p.geo && typeof p.geo.latitude === 'number' && typeof p.geo.longitude === 'number').length;
+        const withQuiz = known.filter(p => p.almanac?.quizQuestions?.length).length;
+        coverageEl.innerHTML = `<div class="list">
+          <div class="place-row" style="grid-template-columns: 1fr auto;"><div><div class="place-title">Known places</div><div class="place-subtitle">Imported or manually marked as known</div></div><span class="tag known">${known.length}</span></div>
+          <div class="place-row" style="grid-template-columns: 1fr auto;"><div><div class="place-title">With hierarchy</div><div class="place-subtitle">Places that know where they fit</div></div><span class="tag type">${withHierarchy}</span></div>
+          <div class="place-row" style="grid-template-columns: 1fr auto;"><div><div class="place-title">With coordinates</div><div class="place-subtitle">Ready for the map</div></div><span class="tag type">${withGeo}</span></div>
+          <div class="place-row" style="grid-template-columns: 1fr auto;"><div><div class="place-title">With quiz questions</div><div class="place-subtitle">Ready for Seb mode</div></div><span class="tag type">${withQuiz}</span></div>
+        </div>`;
+      }
     }
+
+
+
+    function travelCategoryLabel(value) {
+      const labels = { vacation:'Vacation', staycation:'Staycation', short_break:'Short break', cruise:'Cruise', road_trip:'Road trip', unknown:'Unknown' };
+      return labels[value || 'unknown'] || 'Unknown';
+    }
+    function tripTypeLabel(value) {
+      const labels = { single_stay:'Single stay', multi_stay:'Multi-stay', self_catering:'Self-catering', holiday_village:'Holiday village', fly_cruise:'Fly-cruise', ex_uk_cruise:'Ex-UK cruise', open_jaw_cruise:'Open-jaw cruise', road_trip:'Road trip', unknown:'Unknown' };
+      return labels[value || 'unknown'] || 'Unknown';
+    }
+    function travelEventIcon(event) {
+      if (event.category === 'cruise') return '🚢';
+      if (event.tripType === 'holiday_village') return '🌲';
+      if (event.category === 'staycation') return '🏡';
+      if (event.category === 'short_break') return '🎒';
+      if (event.category === 'road_trip') return '🚗';
+      if (event.tripType === 'multi_stay') return '🧳';
+      return '🏝️';
+    }
+    function newTravelEventTemplate(overrides = {}) {
+      return {
+        id: overrides.id || `travel_${Date.now()}_${Math.random().toString(16).slice(2,7)}`,
+        legacyId: overrides.legacyId || '', title: overrides.title || '', status: overrides.status || 'completed', category: overrides.category || 'vacation', tripType: overrides.tripType || 'single_stay',
+        startMonth: normaliseVisitPeriod(overrides.startMonth || ''), durationLabel: overrides.durationLabel || '', travellers: normaliseVisitedBy(overrides.travellers, ['Seb']), accommodationOrShip: overrides.accommodationOrShip || '',
+        cruiseLine: overrides.cruiseLine || '', shipName: overrides.shipName || '', cruiseRoute: overrides.cruiseRoute || '', ports: unique(Array.isArray(overrides.ports) ? overrides.ports : parseCsv(overrides.ports)),
+        flightLinkMode: overrides.flightLinkMode || 'not_recorded', outboundFlightId: overrides.outboundFlightId || '', returnFlightId: overrides.returnFlightId || '', flightNotes: overrides.flightNotes || '',
+        linkedPlaceNames: unique(Array.isArray(overrides.linkedPlaceNames) ? overrides.linkedPlaceNames : parseCsv(overrides.linkedPlaceNames)), linkedPlaceIds: unique(overrides.linkedPlaceIds || []), tags: unique(Array.isArray(overrides.tags) ? overrides.tags : parseCsv(overrides.tags)), notes: overrides.notes || '',
+        createdAt: overrides.createdAt || nowIso(), updatedAt: nowIso()
+      };
+    }
+    function travelEvents() { return Array.isArray(state.travelEvents) ? state.travelEvents : []; }
+    function flightSegments() { return Array.isArray(state.flightSegments) ? state.flightSegments : []; }
+    function travelEventSearchText(event) { return [event.title, event.legacyId, event.status, event.category, event.tripType, event.startMonth, event.durationLabel, event.accommodationOrShip, event.cruiseLine, event.shipName, event.cruiseRoute, event.flightLinkMode, event.flightNotes, (event.travellers||[]).join(' '), (event.ports||[]).join(' '), (event.linkedPlaceNames||[]).join(' '), (event.tags||[]).join(' '), event.notes].join(' ').toLowerCase(); }
+    function placesForTravelEvent(event) {
+      const ids = new Set(event.linkedPlaceIds || []);
+      const names = event.linkedPlaceNames || [];
+      return state.places.filter(place => ids.has(place.id) || placeNameMatches(place, names));
+    }
+    function placeNameMatches(place, names = []) {
+      const keys = [placeDisplayName(place), place.canonicalName, place.displayName, place.enteredName, ...(place.aliases || [])].map(normalise).filter(Boolean);
+      return (names || []).some(name => keys.includes(normalise(name)) || keys.some(k => k.includes(normalise(name))) || normalise(name).includes(keys[0] || '---'));
+    }
+
+    function flightLabel(f) {
+      if (!f) return 'Not recorded';
+      const route = `${f.fromIata || f.fromAirport || 'Unknown'} → ${f.toIata || f.toAirport || 'Unknown'}`;
+      const airline = f.airline || 'Unknown airline';
+      const number = f.flightNumber || 'flight number not recorded';
+      return `${route} · ${airline} · ${number}`;
+    }
+    function travelLinkedFlight(event, direction) {
+      if (!event) return null;
+      const explicitId = direction === 'return' ? event.returnFlightId : event.outboundFlightId;
+      return flightSegments().find(f => f.id === explicitId) || flightSegments().find(f => f.linkedTravelEventId === event.id && f.direction === direction) || null;
+    }
+    function travelFlightSummary(event) {
+      if (!event) return '';
+      if (event.flightLinkMode === 'no_flights') return 'No flights';
+      if (event.flightLinkMode === 'not_applicable') return 'Not applicable';
+      if (event.flightLinkMode === 'needs_parent_confirmation') return 'Needs parent confirmation';
+      const outbound = travelLinkedFlight(event, 'outbound');
+      const inbound = travelLinkedFlight(event, 'return');
+      const parts = [];
+      if (outbound) parts.push(`Outbound: ${flightLabel(outbound)}`);
+      if (inbound) parts.push(`Return: ${flightLabel(inbound)}`);
+      if (parts.length) return parts.join(' | ');
+      return event.flightNotes || '';
+    }
+    function renderTravelFlightSelectors(currentEventId = '') {
+      const outbound = document.getElementById('travelOutboundFlightId');
+      const inbound = document.getElementById('travelReturnFlightId');
+      if (!outbound || !inbound) return;
+      const options = flightSegments()
+        .filter(f => !f.linkedTravelEventId || f.linkedTravelEventId === currentEventId)
+        .map(f => `<option value="${escapeHtml(f.id)}">${escapeHtml(flightLabel(f))}</option>`)
+        .join('');
+      outbound.innerHTML = `<option value="">No outbound flight linked</option>${options}`;
+      inbound.innerHTML = `<option value="">No return flight linked</option>${options}`;
+    }
+    function updateTravelEditorMode(mode = 'holiday') {
+      state.travelEditorMode = mode === 'cruise' ? 'cruise' : 'holiday';
+      const title = document.getElementById('travelAdminHeroTitle');
+      const text = document.getElementById('travelAdminHeroText');
+      if (title) title.textContent = state.travelEditorMode === 'cruise' ? 'Add a cruise.' : 'Add a holiday.';
+      if (text) text.textContent = state.travelEditorMode === 'cruise'
+        ? 'Create or edit a parent-managed cruise record, including route, ports and optional outbound or return flights.'
+        : 'Create or edit a parent-managed holiday or break, including optional outbound or return flights.';
+    }
+    function openTravelCreateMode(mode = 'holiday') {
+      const defaults = mode === 'cruise' ? { category: 'cruise', tripType: 'ex_uk_cruise' } : { category: 'vacation', tripType: 'single_stay' };
+      updateTravelEditorMode(mode);
+      fillTravelEditor(null, defaults);
+      switchSection('addTravel', { travelCreate: state.travelEditorMode });
+    }
+    function openTravelEventEditor(event) {
+      const mode = event?.category === 'cruise' || event?.ports?.length || event?.shipName ? 'cruise' : 'holiday';
+      updateTravelEditorMode(mode);
+      fillTravelEditor(event);
+      switchSection('addTravel', { travelCreate: mode });
+      document.getElementById('travelEditorCard')?.scrollIntoView({ block:'start', behaviour:'smooth' });
+    }
+    function openFlightCreateMode(defaults = {}) {
+      fillFlightEditor(null, defaults);
+      switchSection('addFlight', { flightCreate: 'new' });
+      document.getElementById('flightEditorCard')?.scrollIntoView({ block:'start', behaviour:'smooth' });
+    }
+    function createPlaceholderFlightFromTravel(direction = 'outbound') {
+      const travelId = document.getElementById('travelEditId')?.value || '';
+      const travelTitle = document.getElementById('travelTitle')?.value.trim() || '';
+      const month = document.getElementById('travelStartMonth')?.value.trim() || '';
+      openFlightCreateMode({ linkedTravelEventId: travelId, direction, month, confidence: 'needs_details', notes: travelTitle ? `Placeholder ${direction} flight for ${travelTitle}. Airport details can be completed later.` : `Placeholder ${direction} flight. Airport details can be completed later.` });
+    }
+    async function reconcileTravelFlightLinks(event) {
+      const updates = [
+        { id: event.outboundFlightId, direction: 'outbound' },
+        { id: event.returnFlightId, direction: 'return' }
+      ].filter(item => item.id);
+      if (!updates.length) return;
+      const map = new Map(flightSegments().map(f => [f.id, f]));
+      let changed = false;
+      updates.forEach(item => {
+        const f = map.get(item.id);
+        if (f) {
+          map.set(item.id, { ...f, linkedTravelEventId: event.id, direction: item.direction, month: f.month || event.startMonth || '', updatedAt: nowIso() });
+          changed = true;
+        }
+      });
+      if (changed) {
+        state.flightSegments = [...map.values()];
+        await putMetaValue('flightSegments', state.flightSegments);
+      }
+    }
+    function filteredHolidayEvents() {
+      const category = document.getElementById('holidayCategoryFilter')?.value || 'all';
+      const tripType = document.getElementById('holidayTripTypeFilter')?.value || 'all';
+      const year = document.getElementById('holidayYearFilter')?.value || 'all';
+      const search = (document.getElementById('holidaySearch')?.value || '').trim().toLowerCase();
+      return travelEvents().filter(event => (category === 'all' || event.category === category) && (tripType === 'all' || event.tripType === tripType) && (year === 'all' || String(event.startMonth || '').startsWith(year)) && (!search || travelEventSearchText(event).includes(search))).sort((a,b) => String(a.startMonth || '9999').localeCompare(String(b.startMonth || '9999')));
+    }
+    function renderTravelSummary(targetId, items, cards) {
+      const el = document.getElementById(targetId); if (!el) return;
+      el.innerHTML = cards.map(([icon, value, label]) => `<div class="travel-summary-card"><strong>${escapeHtml(value)}</strong><span>${icon} ${escapeHtml(label)}</span></div>`).join('');
+    }
+    function renderHolidayFilters() {
+      const select = document.getElementById('holidayYearFilter'); if (!select) return;
+      const current = select.value || 'all';
+      const years = unique(travelEvents().map(e => e.startMonth?.slice(0,4)).filter(Boolean)).sort();
+      select.innerHTML = `<option value="all">All years</option>` + years.map(year => `<option value="${escapeHtml(year)}">${escapeHtml(year)}</option>`).join('');
+      select.value = years.includes(current) ? current : 'all';
+    }
+    function renderTravelEventCard(event, options = {}) {
+      const places = placesForTravelEvent(event);
+      const ports = (event.ports || []).slice(0, 4).join(', ') + ((event.ports || []).length > 4 ? ` +${(event.ports || []).length - 4}` : '');
+      const flightSummary = travelFlightSummary(event);
+      return `<article class="travel-event-card"><div class="travel-event-head"><div><div class="eyebrow">${escapeHtml(event.legacyId || travelCategoryLabel(event.category))}</div><h3 class="travel-event-title">${travelEventIcon(event)} ${escapeHtml(event.title || 'Untitled trip')}</h3></div><span class="tag ${event.status === 'planned' ? 'refresh' : 'known'}">${escapeHtml(event.status || 'completed')}</span></div>
+        <div class="travel-meta-grid"><div class="travel-meta-cell"><span>When</span><strong>${escapeHtml(formatDate(event.startMonth) || event.startMonth || 'Not recorded')}</strong></div><div class="travel-meta-cell"><span>Type</span><strong>${escapeHtml(travelCategoryLabel(event.category))} · ${escapeHtml(tripTypeLabel(event.tripType))}</strong></div><div class="travel-meta-cell"><span>${event.category === 'cruise' ? 'Ship' : 'Base'}</span><strong>${escapeHtml(event.accommodationOrShip || event.shipName || 'Not recorded')}</strong></div><div class="travel-meta-cell"><span>${event.category === 'cruise' ? 'Ports' : 'Places'}</span><strong>${escapeHtml(event.category === 'cruise' ? (ports || 'Not recorded') : `${places.length} linked`)}</strong></div></div>
+        ${event.travellers?.length ? `<p class="help-text"><strong>With:</strong> ${escapeHtml(event.travellers.join(', '))}</p>` : ''}${flightSummary ? `<p class="help-text"><strong>Flights:</strong> ${escapeHtml(flightSummary)}</p>` : ''}${event.notes ? `<p class="help-text">${escapeHtml(event.notes)}</p>` : ''}
+        <div class="toolbar"><button class="mini-button" data-edit-travel="${escapeHtml(event.id)}">Parent edit</button>${options.cruiseSelect ? `<button class="mini-button" data-select-cruise="${escapeHtml(event.id)}">Show on map</button>` : ''}${places.slice(0,3).map(p => `<button class="mini-button" data-open-place="${escapeHtml(p.id)}">${escapeHtml(placeDisplayName(p))}</button>`).join('')}</div></article>`;
+    }
+    function renderHolidays() {
+      const el = document.getElementById('holidayCards'); if (!el) return;
+      renderHolidayFilters();
+      const events = filteredHolidayEvents();
+      const completed = events.filter(e => e.status !== 'planned').length;
+      renderTravelSummary('holidaySummary', events, [['🏝️', events.length, 'Trips shown'], ['✅', completed, 'Completed'], ['🚢', events.filter(e => e.category === 'cruise').length, 'Cruises'], ['📆', unique(events.map(e => e.startMonth?.slice(0,4)).filter(Boolean)).length, 'Years']]);
+      el.innerHTML = events.length ? events.map(e => renderTravelEventCard(e)).join('') : `<div class="travel-empty">No holiday records yet. Use Manage → Add Holiday, or import a seb-almanac-travel-data-v1 file from the parent tools.</div>`;
+    }
+    function fillTravelEditor(event = null, defaults = {}) {
+      const e = event || newTravelEventTemplate(defaults);
+      document.getElementById('travelEditId').value = event?.id || '';
+      document.getElementById('travelLegacyId').value = e.legacyId || '';
+      document.getElementById('travelStatus').value = e.status || 'completed';
+      document.getElementById('travelTitle').value = e.title || '';
+      document.getElementById('travelCategory').value = e.category || 'vacation';
+      document.getElementById('travelTripType').value = e.tripType || 'single_stay';
+      document.getElementById('travelStartMonth').value = e.startMonth || '';
+      document.getElementById('travelDuration').value = e.durationLabel || '';
+      document.getElementById('travelTravellers').value = (e.travellers || []).join(', ');
+      document.getElementById('travelBase').value = e.accommodationOrShip || '';
+      document.getElementById('travelCruiseLine').value = e.cruiseLine || '';
+      document.getElementById('travelShipName').value = e.shipName || '';
+      document.getElementById('travelCruiseRoute').value = e.cruiseRoute || '';
+      document.getElementById('travelPorts').value = (e.ports || []).join(', ');
+      renderTravelFlightSelectors(e.id || '');
+      document.getElementById('travelFlightLinkMode').value = e.flightLinkMode || 'not_recorded';
+      document.getElementById('travelOutboundFlightId').value = e.outboundFlightId || travelLinkedFlight(e, 'outbound')?.id || '';
+      document.getElementById('travelReturnFlightId').value = e.returnFlightId || travelLinkedFlight(e, 'return')?.id || '';
+      document.getElementById('travelFlightNotes').value = e.flightNotes || '';
+      document.getElementById('travelLinkedPlaces').value = (e.linkedPlaceNames || []).join(', ');
+      document.getElementById('travelTags').value = (e.tags || []).join(', ');
+      document.getElementById('travelNotes').value = e.notes || '';
+      updateTravelEditorMode((e.category === 'cruise' || e.ports?.length || e.shipName) ? 'cruise' : state.travelEditorMode || 'holiday');
+      document.getElementById('travelEditorTitle').textContent = event ? 'Edit holiday or cruise' : (state.travelEditorMode === 'cruise' ? 'Add cruise' : 'Add holiday');
+    }
+    function collectTravelEditor() {
+      const id = document.getElementById('travelEditId').value || `travel_${Date.now()}_${Math.random().toString(16).slice(2,7)}`;
+      const title = document.getElementById('travelTitle').value.trim();
+      if (!title) throw new Error('Add a trip title first.');
+      return newTravelEventTemplate({ id, legacyId: document.getElementById('travelLegacyId').value.trim(), title, status: document.getElementById('travelStatus').value, category: document.getElementById('travelCategory').value, tripType: document.getElementById('travelTripType').value, startMonth: document.getElementById('travelStartMonth').value.trim(), durationLabel: document.getElementById('travelDuration').value.trim(), travellers: parseCsv(document.getElementById('travelTravellers').value), accommodationOrShip: document.getElementById('travelBase').value.trim(), cruiseLine: document.getElementById('travelCruiseLine').value.trim(), shipName: document.getElementById('travelShipName').value.trim(), cruiseRoute: document.getElementById('travelCruiseRoute').value.trim(), ports: parseCsv(document.getElementById('travelPorts').value), flightLinkMode: document.getElementById('travelFlightLinkMode').value, outboundFlightId: document.getElementById('travelOutboundFlightId').value, returnFlightId: document.getElementById('travelReturnFlightId').value, flightNotes: document.getElementById('travelFlightNotes').value.trim(), linkedPlaceNames: parseCsv(document.getElementById('travelLinkedPlaces').value), tags: parseCsv(document.getElementById('travelTags').value), notes: document.getElementById('travelNotes').value.trim() });
+    }
+    async function saveTravelEventFromEditor() {
+      const status = document.getElementById('travelEditorStatus');
+      try { const event = collectTravelEditor(); const map = new Map(travelEvents().map(e => [e.id, e])); map.set(event.id, { ...(map.get(event.id) || {}), ...event, updatedAt: nowIso() }); state.travelEvents = [...map.values()]; await putMetaValue('travelEvents', state.travelEvents); await reconcileTravelFlightLinks(event); renderAll(); fillTravelEditor(event); status.innerHTML = `<div class="notice ok">Trip saved. Add or refine optional linked flights here: <button class="mini-button" data-new-linked-flight="outbound" type="button">Outbound flight</button> <button class="mini-button" data-new-linked-flight="return" type="button">Return flight</button></div>`; }
+      catch (err) { status.innerHTML = `<div class="notice danger">${escapeHtml(err.message)}</div>`; }
+    }
+    async function deleteTravelEventFromEditor() {
+      const id = document.getElementById('travelEditId').value; if (!id) { toast('No saved trip selected.'); return; }
+      if (!confirm('Delete this trip record? Places and visits are not deleted.')) return;
+      state.travelEvents = travelEvents().filter(e => e.id !== id); await putMetaValue('travelEvents', state.travelEvents); fillTravelEditor(null); renderAll(); toast('Trip deleted.');
+    }
+    function cruiseEvents() { return travelEvents().filter(e => e.category === 'cruise' || e.ports?.length || e.shipName); }
+    function filteredCruiseEvents() {
+      const eventId = document.getElementById('cruiseEventFilter')?.value || 'all'; const line = document.getElementById('cruiseLineFilter')?.value || 'all'; const ship = document.getElementById('cruiseShipFilter')?.value || 'all'; const search = (document.getElementById('cruiseSearch')?.value || '').trim().toLowerCase();
+      return cruiseEvents().filter(e => (eventId === 'all' || e.id === eventId) && (line === 'all' || (e.cruiseLine || 'Unknown') === line) && (ship === 'all' || (e.shipName || e.accommodationOrShip || 'Unknown') === ship) && (!search || travelEventSearchText(e).includes(search)));
+    }
+    function renderCruiseFilters() {
+      const events = cruiseEvents(); const eventSelect = document.getElementById('cruiseEventFilter'); const lineSelect = document.getElementById('cruiseLineFilter'); const shipSelect = document.getElementById('cruiseShipFilter'); if (!eventSelect || !lineSelect || !shipSelect) return;
+      const ce = eventSelect.value || 'all', cl = lineSelect.value || 'all', cs = shipSelect.value || 'all';
+      eventSelect.innerHTML = `<option value="all">Browse all cruises</option>` + events.map(e => `<option value="${escapeHtml(e.id)}">${escapeHtml(`${e.legacyId || ''} ${e.title}`.trim())}</option>`).join(''); eventSelect.value = events.some(e => e.id === ce) ? ce : 'all';
+      const lines = unique(events.map(e => e.cruiseLine || 'Unknown')).sort(); lineSelect.innerHTML = `<option value="all">All cruise lines</option>` + lines.map(v => `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join(''); lineSelect.value = lines.includes(cl) ? cl : 'all';
+      const ships = unique(events.map(e => e.shipName || e.accommodationOrShip || 'Unknown')).sort(); shipSelect.innerHTML = `<option value="all">All ships</option>` + ships.map(v => `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join(''); shipSelect.value = ships.includes(cs) ? cs : 'all';
+    }
+    function eventPortPlaces(event) { const names = unique([...(event.ports || []), ...(event.linkedPlaceNames || [])]); return names.map(name => state.places.find(p => placeNameMatches(p, [name]) && p.geo && typeof p.geo.latitude === 'number' && typeof p.geo.longitude === 'number' && p.placeType !== 'cruise_ship')).filter(Boolean).filter((p,i,a) => a.findIndex(x => x.id === p.id) === i); }
+    async function renderCruiseRouteMap(event) {
+      const mapEl = document.getElementById('cruiseRouteMap'), statusEl = document.getElementById('cruiseMapStatus'), listEl = document.getElementById('cruisePortList'); if (!mapEl || !statusEl || !listEl) return;
+      if (!event) {
+        try { cruiseMapMarkers.forEach(m => m.remove()); cruiseMapMarkers = []; if (cruiseMapLibreMap) { cruiseMapLibreMap.remove(); cruiseMapLibreMap = null; } } catch {}
+        mapEl.innerHTML = `<div class="map-diagnostic"><div class="map-diagnostic-card"><h4>Choose a cruise</h4><p>Select a specific cruise to map its ports. The all-cruises view keeps the map inactive.</p></div></div>`;
+        statusEl.textContent = 'No cruise selected.';
+        listEl.innerHTML = '';
+        return;
+      }
+      const portPlaces = eventPortPlaces(event); listEl.innerHTML = (event.ports || []).length ? event.ports.map((port,i) => { const p = state.places.find(x => placeNameMatches(x,[port])); return `<div class="route-row"><span class="route-number">${i+1}</span><div><div class="place-title">${escapeHtml(port)}</div><div class="place-subtitle">${p ? escapeHtml(typeLabel(p.placeType)) : 'Port record not yet linked'}</div></div>${p ? `<button class="mini-button" data-open-place="${escapeHtml(p.id)}">Open</button>` : ''}</div>`; }).join('') : `<div class="travel-empty">No ports recorded yet.</div>`;
+      if (!portPlaces.length) { mapEl.innerHTML = `<div class="map-diagnostic"><div class="map-diagnostic-card"><h4>Map waiting for port coordinates</h4><p>Enrich port place records to map this itinerary.</p></div></div>`; statusEl.textContent = `${event.ports?.length || 0} ports listed, 0 mapped.`; return; }
+      await renderPointRouteMap({ mapEl, statusEl, points: portPlaces.map((p,i) => ({ lon:Number(p.geo.longitude), lat:Number(p.geo.latitude), label: placeDisplayName(p), subtitle:typeLabel(p.placeType), index:i+1, placeId:p.id })), lineId: 'cruise-route-line', sourceId: 'cruise-route-source', mapRef: 'cruise' });
+      statusEl.textContent = `${portPlaces.length} mapped ports shown.`;
+    }
+    async function renderCruises() {
+      const el = document.getElementById('cruiseCards'); if (!el) return; renderCruiseFilters(); const events = filteredCruiseEvents(); renderTravelSummary('cruiseSummary', events, [['🚢', events.length, 'Cruises shown'], ['⚓', unique(events.flatMap(e => e.ports || [])).length, 'Ports listed'], ['🛳️', unique(events.map(e => e.shipName || e.accommodationOrShip).filter(Boolean)).length, 'Ships'], ['🏳️', unique(events.map(e => e.cruiseLine).filter(Boolean)).length, 'Cruise lines']]); el.innerHTML = events.length ? events.map(e => renderTravelEventCard(e, { cruiseSelect:true })).join('') : `<div class="travel-empty">No cruise records yet. Use Manage → Add Cruise, or import travel data from the parent tools.</div>`; const selectedId = document.getElementById('cruiseEventFilter')?.value; await renderCruiseRouteMap(selectedId && selectedId !== 'all' ? events.find(e => e.id === selectedId) || null : null);
+    }
+    const AIRPORT_COORDS = { MAN:[-2.27495,53.3537], BHX:[-1.74803,52.4539], LHR:[-0.4543,51.47], LGW:[-0.1821,51.1537], STN:[0.235,51.885], DXB:[55.3657,25.2532], AUH:[54.6511,24.433], MLE:[73.5291,4.1918], BGI:[-59.4925,13.0746], FAO:[-7.96591,37.0144], LCA:[33.6249,34.8751], MCO:[-81.3089,28.4312], IVL:[27.4053,68.6073], RHO:[28.0862,36.4054], FCO:[12.2389,41.8003], BCN:[2.07846,41.2974] };
+    function newFlightTemplate(overrides = {}) { return { id: overrides.id || `flight_${Date.now()}_${Math.random().toString(16).slice(2,7)}`, linkedTravelEventId: overrides.linkedTravelEventId || '', direction: overrides.direction || 'outbound', month: normaliseVisitPeriod(overrides.month || ''), fromAirport: overrides.fromAirport || '', fromIata: String(overrides.fromIata || '').toUpperCase(), toAirport: overrides.toAirport || '', toIata: String(overrides.toIata || '').toUpperCase(), airline: overrides.airline || '', flightNumber: overrides.flightNumber || '', aircraft: overrides.aircraft || '', confidence: overrides.confidence || 'needs_details', notes: overrides.notes || '', createdAt: overrides.createdAt || nowIso(), updatedAt: nowIso() }; }
+    function flightSearchText(f) { const trip = travelEvents().find(e => e.id === f.linkedTravelEventId); return [f.direction, f.month, f.fromAirport, f.fromIata, f.toAirport, f.toIata, f.airline, f.flightNumber, f.aircraft, f.confidence, f.notes, trip?.title, trip?.legacyId].join(' ').toLowerCase(); }
+    function filteredFlightSegments() { const year = document.getElementById('flightYearFilter')?.value || 'all'; const airline = document.getElementById('flightAirlineFilter')?.value || 'all'; const conf = document.getElementById('flightConfidenceFilter')?.value || 'all'; const search = (document.getElementById('flightSearch')?.value || '').trim().toLowerCase(); return flightSegments().filter(f => (year === 'all' || String(f.month || '').startsWith(year)) && (airline === 'all' || (f.airline || 'Unknown') === airline) && (conf === 'all' || f.confidence === conf) && (!search || flightSearchText(f).includes(search))).sort((a,b) => String(a.month || '9999').localeCompare(String(b.month || '9999'))); }
+    function renderFlightFilters() {
+      const yearSel = document.getElementById('flightYearFilter'), airlineSel = document.getElementById('flightAirlineFilter'), tripSel = document.getElementById('flightTravelEventId'); if (!yearSel || !airlineSel) return;
+      const cy = yearSel.value || 'all', ca = airlineSel.value || 'all'; const years = unique(flightSegments().map(f => f.month?.slice(0,4)).filter(Boolean)).sort(); yearSel.innerHTML = `<option value="all">All years</option>` + years.map(y => `<option value="${escapeHtml(y)}">${escapeHtml(y)}</option>`).join(''); yearSel.value = years.includes(cy) ? cy : 'all';
+      const airlines = unique(flightSegments().map(f => f.airline || 'Unknown')).sort(); airlineSel.innerHTML = `<option value="all">All airlines</option>` + airlines.map(a => `<option value="${escapeHtml(a)}">${escapeHtml(a)}</option>`).join(''); airlineSel.value = airlines.includes(ca) ? ca : 'all';
+      if (tripSel) { const current = tripSel.value || ''; tripSel.innerHTML = `<option value="">No linked trip yet</option>` + travelEvents().map(e => `<option value="${escapeHtml(e.id)}">${escapeHtml(`${e.legacyId || ''} ${e.title}`.trim())}</option>`).join(''); tripSel.value = travelEvents().some(e => e.id === current) ? current : ''; }
+    }
+    function renderFlightCard(f) { const trip = travelEvents().find(e => e.id === f.linkedTravelEventId); return `<article class="travel-event-card"><div class="travel-event-head"><div><div class="eyebrow">${escapeHtml(formatDate(f.month) || f.month || 'No month')}</div><h3 class="travel-event-title">✈️ ${escapeHtml(f.fromIata || f.fromAirport || 'Unknown')} → ${escapeHtml(f.toIata || f.toAirport || 'Unknown')}</h3></div><span class="tag ${f.confidence === 'parent_confirmed' ? 'known' : 'refresh'}">${escapeHtml(f.confidence || 'needs_details')}</span></div><div class="travel-meta-grid"><div class="travel-meta-cell"><span>From</span><strong>${escapeHtml([f.fromAirport, f.fromIata].filter(Boolean).join(' · ') || 'Unknown')}</strong></div><div class="travel-meta-cell"><span>To</span><strong>${escapeHtml([f.toAirport, f.toIata].filter(Boolean).join(' · ') || 'Unknown')}</strong></div><div class="travel-meta-cell"><span>Airline</span><strong>${escapeHtml(f.airline || 'Unknown')}</strong></div><div class="travel-meta-cell"><span>Flight number</span><strong>${escapeHtml(f.flightNumber || 'Not recorded')}</strong></div><div class="travel-meta-cell"><span>Aircraft</span><strong>${escapeHtml(f.aircraft || 'Not recorded')}</strong></div><div class="travel-meta-cell"><span>Trip</span><strong>${escapeHtml(trip?.title || 'Not linked')}</strong></div></div>${f.notes ? `<p class="help-text">${escapeHtml(f.notes)}</p>` : ''}<div class="toolbar"><button class="mini-button" data-edit-flight="${escapeHtml(f.id)}">Parent edit</button></div></article>`; }
+    function fillFlightEditor(f = null, defaults = {}) { const x = f || newFlightTemplate(defaults); document.getElementById('flightEditId').value = f?.id || ''; document.getElementById('flightTravelEventId').value = x.linkedTravelEventId || ''; document.getElementById('flightDirection').value = x.direction || 'outbound'; document.getElementById('flightMonth').value = x.month || ''; document.getElementById('flightFromAirport').value = x.fromAirport || ''; document.getElementById('flightFromIata').value = x.fromIata || ''; document.getElementById('flightToAirport').value = x.toAirport || ''; document.getElementById('flightToIata').value = x.toIata || ''; document.getElementById('flightAirline').value = x.airline || ''; document.getElementById('flightNumber').value = x.flightNumber || ''; document.getElementById('flightAircraft').value = x.aircraft || ''; document.getElementById('flightConfidence').value = x.confidence || 'needs_details'; document.getElementById('flightNotes').value = x.notes || ''; }
+    function collectFlightEditor() { const id = document.getElementById('flightEditId').value || `flight_${Date.now()}_${Math.random().toString(16).slice(2,7)}`; return newFlightTemplate({ id, linkedTravelEventId: document.getElementById('flightTravelEventId').value, direction: document.getElementById('flightDirection').value, month: document.getElementById('flightMonth').value.trim(), fromAirport: document.getElementById('flightFromAirport').value.trim(), fromIata: document.getElementById('flightFromIata').value.trim().toUpperCase(), toAirport: document.getElementById('flightToAirport').value.trim(), toIata: document.getElementById('flightToIata').value.trim().toUpperCase(), airline: document.getElementById('flightAirline').value.trim(), flightNumber: document.getElementById('flightNumber').value.trim(), aircraft: document.getElementById('flightAircraft').value.trim(), confidence: document.getElementById('flightConfidence').value, notes: document.getElementById('flightNotes').value.trim() }); }
+    async function saveFlightFromEditor() { const st = document.getElementById('flightEditorStatus'); const f = collectFlightEditor(); if (!f.fromIata && !f.fromAirport && !f.toIata && !f.toAirport) { st.innerHTML = `<div class="notice warn">Add at least one airport before saving.</div>`; return; } const map = new Map(flightSegments().map(x => [x.id, x])); map.set(f.id, { ...(map.get(f.id)||{}), ...f, updatedAt: nowIso() }); state.flightSegments = [...map.values()]; await putMetaValue('flightSegments', state.flightSegments); renderAll(); fillFlightEditor(f); st.innerHTML = `<div class="notice ok">Flight saved.</div>`; }
+    async function deleteFlightFromEditor() { const id = document.getElementById('flightEditId').value; if (!id) { toast('No saved flight selected.'); return; } if (!confirm('Delete this flight record?')) return; state.flightSegments = flightSegments().filter(f => f.id !== id); await putMetaValue('flightSegments', state.flightSegments); fillFlightEditor(null); renderAll(); toast('Flight deleted.'); }
+    function curvedLine(start, end, steps = 48) { const [x1,y1]=start, [x2,y2]=end; const mx=(x1+x2)/2, my=(y1+y2)/2 + Math.min(25, Math.max(-25, Math.abs(x2-x1)/5)); const coords=[]; for(let i=0;i<=steps;i++){ const t=i/steps; const x=(1-t)*(1-t)*x1+2*(1-t)*t*mx+t*t*x2; const y=(1-t)*(1-t)*y1+2*(1-t)*t*my+t*t*y2; coords.push([x,y]); } return coords; }
+    async function renderPointRouteMap({ mapEl, statusEl, points, lineId, sourceId, mapRef }) {
+      const loaded = await ensureMapLibreLoaded(); if (!loaded) { mapEl.innerHTML = `<div class="map-diagnostic"><div class="map-diagnostic-card"><h4>Map unavailable</h4><p>${escapeHtml(mapLibreProblem || 'The map library could not be loaded.')}</p></div></div>`; return; }
+      const isFlight = mapRef === 'flight'; let targetMap = isFlight ? flightMapLibreMap : cruiseMapLibreMap; let markers = isFlight ? flightMapMarkers : cruiseMapMarkers;
+      if (!targetMap) { mapEl.innerHTML = ''; targetMap = new maplibregl.Map({ container: mapEl, style: mapLibreRasterStyle(), center:[0,20], zoom:1.2, attributionControl:true }); targetMap.addControl(new maplibregl.NavigationControl({ visualizePitch:true }), 'top-left'); await new Promise((res,rej)=>{ const timer=setTimeout(()=>rej(new Error('Map load timed out.')),12000); targetMap.once('load',()=>{clearTimeout(timer);res();}); targetMap.once('error',e=>{clearTimeout(timer);rej(e?.error||new Error('Map failed to load.'));}); }); if (isFlight) flightMapLibreMap = targetMap; else cruiseMapLibreMap = targetMap; }
+      markers.forEach(m => { try { m.remove(); } catch {} }); markers.length = 0;
+      const bounds = new maplibregl.LngLatBounds(); points.forEach(pt => { bounds.extend([pt.lon, pt.lat]); const el=document.createElement('button'); el.type='button'; el.className='adventure-marker'; el.innerHTML=`<span>${pt.index || '•'}</span>`; const popupHtml = `<strong>${escapeHtml(pt.label)}</strong><br>${escapeHtml(pt.subtitle || '')}${pt.placeId ? `<div style="margin-top:8px;"><button class="mini-button" data-open-place="${escapeHtml(pt.placeId)}">Open place</button></div>` : ''}`; const marker=new maplibregl.Marker({element:el,anchor:'bottom'}).setLngLat([pt.lon,pt.lat]).setPopup(new maplibregl.Popup({offset:24}).setHTML(popupHtml)).addTo(targetMap); markers.push(marker); });
+      let lines=[]; if (isFlight) { flightSegments().filter(f => filteredFlightSegments().some(x => x.id === f.id)).forEach(f => { const a=AIRPORT_COORDS[String(f.fromIata||'').toUpperCase()], b=AIRPORT_COORDS[String(f.toIata||'').toUpperCase()]; if (a && b) lines.push({ type:'Feature', properties:{}, geometry:{ type:'LineString', coordinates:curvedLine(a,b) }}); }); } else if (points.length > 1) { lines.push({ type:'Feature', properties:{}, geometry:{ type:'LineString', coordinates:points.map(p => [p.lon,p.lat]) }}); }
+      const data={ type:'FeatureCollection', features:lines }; if (targetMap.getSource(sourceId)) targetMap.getSource(sourceId).setData(data); else { targetMap.addSource(sourceId,{type:'geojson',data}); targetMap.addLayer({ id:lineId, type:'line', source:sourceId, paint:{ 'line-color':'#28706a','line-width':3,'line-opacity':.72 }}); }
+      if (points.length === 1) targetMap.flyTo({center:[points[0].lon,points[0].lat],zoom:6,essential:false}); else if (points.length) targetMap.fitBounds(bounds,{padding:58,maxZoom:6,duration:700}); setTimeout(()=>targetMap.resize(),150);
+    }
+    async function renderFlightMap() { const mapEl=document.getElementById('flightRouteMap'), statusEl=document.getElementById('flightMapStatus'); if(!mapEl||!statusEl)return; const flights=filteredFlightSegments(); const points=[]; flights.forEach(f=>{ const a=AIRPORT_COORDS[String(f.fromIata||'').toUpperCase()], b=AIRPORT_COORDS[String(f.toIata||'').toUpperCase()]; if(a) points.push({lon:a[0],lat:a[1],label:`${f.fromAirport||f.fromIata}`,subtitle:f.fromIata,index:'✈'}); if(b) points.push({lon:b[0],lat:b[1],label:`${f.toAirport||f.toIata}`,subtitle:f.toIata,index:'✈'}); }); const uniquePoints=[]; const seen=new Set(); points.forEach(p=>{ const k=`${p.lon}|${p.lat}|${p.label}`; if(!seen.has(k)){seen.add(k);uniquePoints.push(p);} }); if(!uniquePoints.length){ mapEl.innerHTML=`<div class="map-diagnostic"><div class="map-diagnostic-card"><h4>Flight map waiting for airport codes</h4><p>Add IATA airport codes such as MAN, DXB or MCO to draw routes.</p></div></div>`; statusEl.textContent=`${flights.length} flight records shown, 0 mappable routes.`; return; } await renderPointRouteMap({mapEl,statusEl,points:uniquePoints,lineId:'flight-route-line',sourceId:'flight-route-source',mapRef:'flight'}); statusEl.textContent=`${flights.length} flight records, ${uniquePoints.length} airport point${uniquePoints.length===1?'':'s'} shown.`; }
+    async function renderFlights() { const el=document.getElementById('flightCards'); if(!el)return; renderFlightFilters(); const flights=filteredFlightSegments(); renderTravelSummary('flightSummary', flights, [['✈️', flights.length, 'Flights shown'], ['🏷️', unique(flights.map(f=>f.airline).filter(Boolean)).length, 'Airlines'], ['🛫', unique(flights.flatMap(f=>[f.fromIata,f.toIata]).filter(Boolean)).length, 'Airport codes'], ['🧾', flights.filter(f=>f.confidence!=='parent_confirmed').length, 'Need details']]); el.innerHTML=flights.length?flights.map(renderFlightCard).join(''):`<div class="travel-empty">No flight records yet. Use Manage → Add Flight to create confirmed or placeholder flight legs.</div>`; await renderFlightMap(); }
+    function exportTravelData() { const payload={ schemaVersion:'seb-almanac-travel-data-v1', exportedAt:nowIso(), travelEvents:travelEvents(), flightSegments:flightSegments(), notes:'Parent-managed travel events and flight legs. This is separate from almanac place enrichment.' }; downloadJson(`seb-almanac-travel-data-${new Date().toISOString().slice(0,10)}.json`, payload); document.getElementById('travelDataStatus').innerHTML=`<div class="notice ok">Travel data exported.</div>`; }
+    async function importTravelData() { const el=document.getElementById('travelDataImportText'), st=document.getElementById('travelDataStatus'); try { const payload=JSON.parse(el.value || '{}'); if(payload.schemaVersion !== 'seb-almanac-travel-data-v1') throw new Error('Expected schemaVersion seb-almanac-travel-data-v1.'); if(!Array.isArray(payload.travelEvents) && !Array.isArray(payload.flightSegments)) throw new Error('File must contain travelEvents and/or flightSegments arrays.'); if(!confirm(`Import ${(payload.travelEvents||[]).length} trip records and ${(payload.flightSegments||[]).length} flight records? This will replace current travel-event data.`)) return; state.travelEvents=(payload.travelEvents||[]).map(e=>newTravelEventTemplate(e)); state.flightSegments=(payload.flightSegments||[]).map(f=>newFlightTemplate(f)); await putMetaValue('travelEvents', state.travelEvents); await putMetaValue('flightSegments', state.flightSegments); renderAll(); st.innerHTML=`<div class="notice ok">Travel data imported.</div>`; } catch(err) { st.innerHTML=`<div class="notice danger">Import failed: ${escapeHtml(err.message)}</div>`; } }
 
     function renderNavCounts() {
       document.getElementById('navTotal').textContent = state.places.length;
       document.getElementById('navKnown').textContent = state.places.filter(p => p.known).length;
+      document.getElementById('navHolidays') && (document.getElementById('navHolidays').textContent = travelEvents().length);
+      document.getElementById('navCruises') && (document.getElementById('navCruises').textContent = cruiseEvents().length);
+      document.getElementById('navFlights') && (document.getElementById('navFlights').textContent = flightSegments().length);
       const navTimeline = document.getElementById('navTimeline');
       if (navTimeline) navTimeline.textContent = collectTimelineEntries().entries.length;
       document.getElementById('navQueue').textContent = getQueuePlaces().length;
@@ -4446,7 +5566,11 @@ Required JSON shape:
       renderTypeSummary();
       renderQueue();
       renderAlmanac();
-      renderTimeline();
+      renderHolidays();
+      renderCruises();
+      renderFlights();
+      renderTravelFlightSelectors(document.getElementById('travelEditId')?.value || '');
+      renderTimelineViews();
       renderHierarchy();
       renderQuiz();
       renderQuizSafetySettings();
@@ -4599,10 +5723,12 @@ Required JSON shape:
         schemaVersion: 'seb-almanac-backup-v1',
         exportedAt: nowIso(),
         storageMode: state.fallback ? 'localStorage fallback' : 'IndexedDB',
-        places: state.places
+        places: state.places,
+        travelEvents: state.travelEvents || [],
+        flightSegments: state.flightSegments || []
       };
       downloadJson(`seb-adventure-almanac-backup-${new Date().toISOString().slice(0,10)}.json`, payload);
-      document.getElementById('backupStatus').innerHTML = `<div class="notice ok">Full backup exported with ${state.places.length} place record${state.places.length === 1 ? '' : 's'}.</div>`;
+      document.getElementById('backupStatus').innerHTML = `<div class="notice ok">Full backup exported with ${state.places.length} place record${state.places.length === 1 ? '' : 's'}, ${(state.travelEvents || []).length} trip record${(state.travelEvents || []).length === 1 ? '' : 's'} and ${(state.flightSegments || []).length} flight record${(state.flightSegments || []).length === 1 ? '' : 's'}.</div>`;
     }
 
     async function restoreBackup() {
@@ -4618,6 +5744,8 @@ Required JSON shape:
         if (!confirm(`Restore ${payload.places.length} place records? This will replace the current local database.`)) return;
         await clearAllPlaces();
         await putPlaces(payload.places);
+        await putMetaValue('travelEvents', Array.isArray(payload.travelEvents) ? payload.travelEvents : []);
+        await putMetaValue('flightSegments', Array.isArray(payload.flightSegments) ? payload.flightSegments : []);
         await refreshState();
         status.innerHTML = `<div class="notice ok">Backup restored successfully.</div>`;
       } catch (err) {
@@ -4664,6 +5792,9 @@ Required JSON shape:
         return;
       }
       await clearAllPlaces();
+      await clearMetaValues();
+      state.travelEvents = [];
+      state.flightSegments = [];
       state.queuedSelection.clear();
       await refreshState();
       document.getElementById('settingsStatus').innerHTML = `<div class="notice ok">All local almanac data has been cleared.</div>`;
@@ -4691,10 +5822,56 @@ Required JSON shape:
       renderAlmanac();
     }
 
-    function switchSection(sectionId) {
+    function closeMobileNav() {
+      const sidebar = document.querySelector('.sidebar');
+      const toggle = document.getElementById('mobileNavToggle');
+      if (!sidebar || !toggle) return;
+      sidebar.classList.remove('nav-open');
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.textContent = '☰ Menu';
+    }
+
+    function toggleMobileNav() {
+      const sidebar = document.querySelector('.sidebar');
+      const toggle = document.getElementById('mobileNavToggle');
+      if (!sidebar || !toggle) return;
+      const open = !sidebar.classList.contains('nav-open');
+      sidebar.classList.toggle('nav-open', open);
+      toggle.setAttribute('aria-expanded', String(open));
+      toggle.textContent = open ? '× Close menu' : '☰ Menu';
+    }
+
+    function setManageNavCollapsed(collapsed = true) {
+      const items = document.getElementById('manageNavItems');
+      const toggle = document.getElementById('manageNavToggle');
+      const chevron = document.getElementById('manageNavChevron');
+      if (!items || !toggle) return;
+      items.classList.toggle('collapsed', collapsed);
+      toggle.setAttribute('aria-expanded', String(!collapsed));
+      if (chevron) chevron.textContent = collapsed ? '▸' : '▾';
+    }
+
+    function toggleManageNav() {
+      const items = document.getElementById('manageNavItems');
+      if (!items) return;
+      setManageNavCollapsed(!items.classList.contains('collapsed') ? true : false);
+    }
+
+    function isManageSection(sectionId) {
+      return ['add', 'addTravel', 'addFlight', 'editTimeline', 'queue', 'import', 'settings'].includes(sectionId);
+    }
+
+    function switchSection(sectionId, options = {}) {
       state.activeSection = sectionId;
+      const intent = options.travelCreate || options.flightCreate || '';
+      state.activeNavKey = `${sectionId}:${intent}`;
       document.querySelectorAll('.section').forEach(s => s.classList.toggle('active', s.id === sectionId));
-      document.querySelectorAll('.nav-button').forEach(b => b.classList.toggle('active', b.dataset.section === sectionId));
+      document.querySelectorAll('.nav-button').forEach(b => {
+        const key = `${b.dataset.section || ''}:${b.dataset.travelCreate || b.dataset.flightCreate || ''}`;
+        b.classList.toggle('active', key === state.activeNavKey || (!intent && b.dataset.section === sectionId && !b.dataset.travelCreate && !b.dataset.flightCreate));
+      });
+      closeMobileNav();
+      setManageNavCollapsed(!isManageSection(sectionId));
       if (sectionId === 'hierarchy') setTimeout(() => {
         renderGeoPins();
         if (mapLibreMap) mapLibreMap.resize();
@@ -4703,8 +5880,14 @@ Required JSON shape:
     }
 
     function attachEvents() {
+      document.getElementById('mobileNavToggle')?.addEventListener('click', toggleMobileNav);
+      document.getElementById('manageNavToggle')?.addEventListener('click', toggleManageNav);
       document.querySelectorAll('.nav-button[data-section]').forEach(button => {
-        button.addEventListener('click', () => switchSection(button.dataset.section));
+        button.addEventListener('click', () => {
+          if (button.dataset.travelCreate) { openTravelCreateMode(button.dataset.travelCreate); return; }
+          if (button.dataset.flightCreate) { openFlightCreateMode(); return; }
+          switchSection(button.dataset.section);
+        });
       });
       document.querySelectorAll('[data-jump]').forEach(button => {
         button.addEventListener('click', () => switchSection(button.dataset.jump));
@@ -4792,14 +5975,56 @@ Required JSON shape:
       document.getElementById('resetQuizBtn').addEventListener('click', resetQuizScore);
       document.getElementById('quizTypeFilter').addEventListener('change', () => { state.quiz.current = null; renderQuiz(); });
       document.getElementById('quizDifficultyFilter').addEventListener('change', () => { state.quiz.current = null; renderQuiz(); });
-      document.getElementById('timelineScopeFilter')?.addEventListener('change', renderTimeline);
-      document.getElementById('timelineTypeFilter')?.addEventListener('change', renderTimeline);
-      document.getElementById('timelineOrderFilter')?.addEventListener('change', renderTimeline);
-      document.getElementById('timelineSearch')?.addEventListener('input', renderTimeline);
+      document.getElementById('timelineScopeFilter')?.addEventListener('change', () => { state.timelineSelection.clear(); clearTimelineBulkPreview(); renderTimelineViews(); });
+      document.getElementById('timelineTypeFilter')?.addEventListener('change', () => { state.timelineSelection.clear(); clearTimelineBulkPreview(); renderTimelineViews(); });
+      document.getElementById('timelineOrderFilter')?.addEventListener('change', renderTimelineViews);
+      document.getElementById('timelineSearch')?.addEventListener('input', () => { state.timelineSelection.clear(); clearTimelineBulkPreview(); renderTimelineViews(); });
+      document.getElementById('timelineSelectVisibleBtn')?.addEventListener('click', () => {
+        selectTimelineIds(filteredTimelinePlaceIds({ includeEntries: true, includeUndated: true }));
+        toast(`${state.timelineSelection.size} visible place${state.timelineSelection.size === 1 ? '' : 's'} selected.`);
+      });
+      document.getElementById('timelineSelectUndatedBtn')?.addEventListener('click', () => {
+        selectTimelineIds(filteredTimelinePlaceIds({ includeEntries: false, includeUndated: true }));
+        toast(`${state.timelineSelection.size} no-date place${state.timelineSelection.size === 1 ? '' : 's'} selected.`);
+      });
+      document.getElementById('timelineClearSelectionBtn')?.addEventListener('click', () => {
+        state.timelineSelection.clear();
+        clearTimelineBulkPreview();
+        updateTimelineSelectionCount();
+        renderTimelineViews();
+      });
+      document.getElementById('timelinePreviewBulkBtn')?.addEventListener('click', previewTimelineBulkVisit);
+      document.getElementById('timelineBulkConfirm')?.addEventListener('input', () => {
+        const commit = document.getElementById('timelineCommitBulkBtn');
+        if (commit) commit.disabled = !state.timelineBulkPreview || (document.getElementById('timelineBulkConfirm')?.value || '').trim() !== 'APPLY VISIT BATCH';
+      });
+      document.getElementById('timelineCommitBulkBtn')?.addEventListener('click', commitTimelineBulkVisit);
       document.addEventListener('click', event => {
         const yearJump = event.target.closest('[data-jump-year]');
         if (yearJump) document.getElementById(`timeline-year-${yearJump.dataset.jumpYear}`)?.scrollIntoView({ behaviour: 'smooth', block: 'start' });
       });
+      document.addEventListener('keydown', event => {
+        const card = event.target.closest?.('.timeline-place-card[data-open-place]');
+        if (!card || (event.key !== 'Enter' && event.key !== ' ')) return;
+        event.preventDefault();
+        openPlaceDetail(card.dataset.openPlace);
+      });
+
+      ['holidayCategoryFilter','holidayTripTypeFilter','holidayYearFilter','holidaySearch'].forEach(id => document.getElementById(id)?.addEventListener(id.endsWith('Search') ? 'input' : 'change', renderHolidays));
+      ['cruiseEventFilter','cruiseLineFilter','cruiseShipFilter','cruiseSearch'].forEach(id => document.getElementById(id)?.addEventListener(id.endsWith('Search') ? 'input' : 'change', renderCruises));
+      ['flightYearFilter','flightAirlineFilter','flightConfidenceFilter','flightSearch'].forEach(id => document.getElementById(id)?.addEventListener(id.endsWith('Search') ? 'input' : 'change', renderFlights));
+      document.getElementById('travelSaveBtn')?.addEventListener('click', saveTravelEventFromEditor);
+      document.getElementById('travelClearBtn')?.addEventListener('click', () => fillTravelEditor(null, state.travelEditorMode === 'cruise' ? { category:'cruise', tripType:'ex_uk_cruise' } : { category:'vacation', tripType:'single_stay' }));
+      document.getElementById('travelDeleteBtn')?.addEventListener('click', deleteTravelEventFromEditor);
+      document.getElementById('travelEditorNewBtn')?.addEventListener('click', () => fillTravelEditor(null, state.travelEditorMode === 'cruise' ? { category:'cruise', tripType:'ex_uk_cruise' } : { category:'vacation', tripType:'single_stay' }));
+      document.getElementById('travelAddOutboundFlightBtn')?.addEventListener('click', () => createPlaceholderFlightFromTravel('outbound'));
+      document.getElementById('travelAddReturnFlightBtn')?.addEventListener('click', () => createPlaceholderFlightFromTravel('return'));
+      document.getElementById('flightSaveBtn')?.addEventListener('click', saveFlightFromEditor);
+      document.getElementById('flightClearBtn')?.addEventListener('click', () => fillFlightEditor(null));
+      document.getElementById('flightDeleteBtn')?.addEventListener('click', deleteFlightFromEditor);
+      document.getElementById('flightEditorNewBtn')?.addEventListener('click', () => fillFlightEditor(null));
+      document.getElementById('exportTravelDataBtn')?.addEventListener('click', exportTravelData);
+      document.getElementById('importTravelDataBtn')?.addEventListener('click', importTravelData);
       document.getElementById('mapScopeFilter')?.addEventListener('change', renderGeoPins);
       document.getElementById('mapTypeFilter')?.addEventListener('change', renderGeoPins);
       document.getElementById('mapRegionFilter')?.addEventListener('change', renderGeoPins);
@@ -4812,6 +6037,15 @@ Required JSON shape:
           const id = event.target.dataset.id;
           if (event.target.checked) state.queuedSelection.add(id);
           else state.queuedSelection.delete(id);
+        }
+        if (event.target.classList.contains('timeline-select-check')) {
+          const id = event.target.dataset.timelineSelect;
+          if (id) {
+            if (event.target.checked) state.timelineSelection.add(id);
+            else state.timelineSelection.delete(id);
+            clearTimelineBulkPreview();
+            updateTimelineSelectionCount();
+          }
         }
       });
       document.addEventListener('click', async event => {
@@ -4831,6 +6065,8 @@ Required JSON shape:
           if (action === 'almanac-types') { openAlmanacShortcut({ title: homeAction.dataset.title || 'Filtered places', types: (homeAction.dataset.types || '').split(',').filter(Boolean) }); return; }
           if (action === 'almanac-status') { openAlmanacShortcut({ title: homeAction.dataset.title || 'Filtered places', status: homeAction.dataset.status || 'all' }); return; }
         }
+        const linkedFlight = event.target.closest('[data-new-linked-flight]');
+        if (linkedFlight) { createPlaceholderFlightFromTravel(linkedFlight.dataset.newLinkedFlight || 'outbound'); return; }
         if (addVisit) { await addVisitToPlace(addVisit.dataset.addVisit); return; }
         if (open) openPlaceDetail(open.dataset.openPlace);
         if (refresh) await markForRefresh(refresh.dataset.refreshPlace);
@@ -4844,9 +6080,23 @@ Required JSON shape:
       });
     }
 
+
+
+    document.addEventListener('click', event => {
+      const editTravel = event.target.closest('[data-edit-travel]');
+      if (editTravel) { const ev = travelEvents().find(e => e.id === editTravel.dataset.editTravel); if (ev) openTravelEventEditor(ev); }
+      const selectCruise = event.target.closest('[data-select-cruise]');
+      if (selectCruise) { const sel = document.getElementById('cruiseEventFilter'); if (sel) { sel.value = selectCruise.dataset.selectCruise; renderCruises(); document.getElementById('cruiseRouteMap')?.scrollIntoView({ block:'center', behaviour:'smooth' }); } }
+      const editFlight = event.target.closest('[data-edit-flight]');
+      if (editFlight) { const f = flightSegments().find(x => x.id === editFlight.dataset.editFlight); if (f) { fillFlightEditor(f); switchSection('addFlight', { flightCreate: 'new' }); document.getElementById('flightEditorCard')?.scrollIntoView({ block:'start', behaviour:'smooth' }); } }
+    });
+
     async function boot() {
       attachEvents();
       resetGuidedCapture();
+      updateTravelEditorMode('holiday');
+      fillTravelEditor?.(null, { category:'vacation', tripType:'single_stay' });
+      fillFlightEditor?.(null);
       await initDb();
       await refreshState();
       if (state.fallback) toast('IndexedDB was not available. Using localStorage fallback for this browser.');
