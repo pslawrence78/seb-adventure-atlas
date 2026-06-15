@@ -1945,7 +1945,7 @@
     }
 
 
-    /* v0.25+ Travel events, cruises and flights; v0.27 explore/admin timeline separation */
+    /* v0.25+ Travel events, cruises and flights; v0.27 explore/admin timeline separation; v0.28 Import Centre travel import */
     .travel-control-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; align-items: end; }
     .travel-summary-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin: 16px 0; }
     .travel-summary-card { padding: 16px; border: 1px solid var(--line); border-radius: var(--radius-small); background: rgba(255,250,241,.82); box-shadow: var(--shadow); }
@@ -2014,7 +2014,8 @@
           <button class="nav-button" data-section="addFlight" data-flight-create="new"><span class="nav-left"><span class="nav-emoji">✈️</span>Add Flight</span></button>
           <button class="nav-button" data-section="editTimeline"><span class="nav-left"><span class="nav-emoji">🗓️</span>Edit Timeline</span></button>
           <button class="nav-button" data-section="queue"><span class="nav-left"><span class="nav-emoji">✨</span>Enrich queue</span> <span class="pill-count" id="navQueue">0</span></button>
-          <button class="nav-button" data-section="import"><span class="nav-left"><span class="nav-emoji">📥</span>Import centre</span></button>
+          <button class="nav-button" data-section="importEnrichment"><span class="nav-left"><span class="nav-emoji">📥</span>Import Enrichment</span></button>
+          <button class="nav-button" data-section="importTravel"><span class="nav-left"><span class="nav-emoji">🧳</span>Import Travel</span></button>
           <button class="nav-button" data-section="settings"><span class="nav-left"><span class="nav-emoji">⚙️</span>Settings & data</span></button>
         </div>
       </div>
@@ -2032,7 +2033,7 @@
               <button class="button primary" data-jump="almanac">Explore almanac</button>
               <button class="button secondary" data-jump="quiz">Start quiz</button>
               <button class="button" data-jump="timeline">Open timeline</button>
-              <button class="button" data-jump="hierarchy">Open map</button>
+              <button class="button" data-jump="hierarchy">Open Map</button>
               <button class="button" id="surprisePlaceBtn">Surprise me</button>
             </div>
           </div>
@@ -2179,18 +2180,21 @@
         </div>
       </section>
 
-      <section id="import" class="section">
+      <section id="importEnrichment" class="section">
         <div class="hero">
-          <div class="eyebrow">Import centre</div>
-          <h2>Bring enriched almanac data back in.</h2>
-          <p>Import ChatGPT's structured JSON, review new and updated records, then commit the data and mark those places as known.</p>
+          <div class="eyebrow">Import Enrichment</div>
+          <h2>Bring ChatGPT place enrichment back in.</h2>
+          <p>Import structured almanac records using <strong>seb-almanac-enrichment-v1</strong>. This workflow is only for places, hierarchy, facts, sources, quiz questions and visit contexts.</p>
         </div>
         <div class="grid cols-2">
           <div class="card">
-            <h3>Import enrichment JSON</h3>
+            <h3>Import JSON</h3>
             <p class="help-text">Choose a JSON file, or paste the JSON text that ChatGPT returned in the chat. A selected file is used first; pasted text is the fallback.</p>
-            <input id="importFile" type="file" accept="application/json,.json,.txt" />
-            <label for="importText" style="margin-top:14px;">Paste JSON response</label>
+            <div class="toolbar" style="margin-top:12px; margin-bottom:12px;">
+              <label class="button" for="importFile" style="cursor:pointer;">Choose File</label>
+              <input id="importFile" class="sr-only" type="file" accept="application/json,.json,.txt" />
+            </div>
+            <label for="importText">Paste JSON</label>
             <textarea id="importText" placeholder="Paste ChatGPT's JSON here if it did not produce a downloadable file. The app can read raw JSON, fenced JSON, or JSON between BEGIN_SEB_ALMANAC_JSON and END_SEB_ALMANAC_JSON." style="min-height:180px;"></textarea>
             <div class="toolbar">
               <button class="button primary" id="previewImportBtn">Preview import</button>
@@ -2201,13 +2205,48 @@
           </div>
           <div class="card">
             <h3>Expected import format</h3>
-            <p class="help-text">The app expects <strong>seb-almanac-enrichment-v1</strong>. Each hierarchy level should ideally also be included as a separate place record. You can import either a downloaded JSON file or JSON pasted from ChatGPT.</p>
+            <p class="help-text">The app expects <strong>seb-almanac-enrichment-v1</strong>. Each hierarchy level should ideally also be included as a separate place record. Repeat visits should remain as separate <strong>visitContexts</strong>.</p>
             <div class="codebox" id="importExample"></div>
           </div>
         </div>
         <div class="card" style="margin-top:16px;">
-          <h3>Import preview</h3>
+          <h3>Import Preview</h3>
           <div id="importPreview" class="table-wrap"></div>
+        </div>
+      </section>
+
+      <section id="importTravel" class="section">
+        <div class="hero">
+          <div class="eyebrow">Import Travel</div>
+          <h2>Bring parent-managed travel data back in.</h2>
+          <p>Import holidays, cruises and flights using <strong>seb-almanac-travel-data-v1</strong>. This workflow stays separate from place enrichment.</p>
+        </div>
+        <div class="grid cols-2">
+          <div class="card">
+            <h3>Import JSON</h3>
+            <p class="help-text">Choose a JSON file, or paste travel JSON exported from Seb's Atlas. A selected file is used first; pasted text is the fallback.</p>
+            <div class="toolbar" style="margin-top:12px; margin-bottom:12px;">
+              <label class="button" for="travelImportFile" style="cursor:pointer;">Choose File</label>
+              <input id="travelImportFile" class="sr-only" type="file" accept="application/json,.json,.txt" />
+            </div>
+            <label for="travelImportText">Paste JSON</label>
+            <textarea id="travelImportText" class="travel-import-area" placeholder="Paste seb-almanac-travel-data-v1 JSON here, or use an exported travel data file as a template." style="min-height:180px;"></textarea>
+            <div class="toolbar">
+              <button class="button primary" id="previewTravelImportBtn" type="button">Preview import</button>
+              <button class="button secondary" id="commitTravelImportBtn" type="button" disabled>Commit import</button>
+              <button class="button" id="clearTravelImportInputBtn" type="button">Clear import input</button>
+            </div>
+            <div id="travelImportStatus" style="margin-top:14px;"></div>
+          </div>
+          <div class="card">
+            <h3>Expected import format</h3>
+            <p class="help-text">The app expects <strong>seb-almanac-travel-data-v1</strong>. Travel imports can contain trip records, flight records, or both. Missing airline, flight number and aircraft values are allowed and should remain blank rather than inferred.</p>
+            <div class="codebox" id="travelImportExample"></div>
+          </div>
+        </div>
+        <div class="card" style="margin-top:16px;">
+          <h3>Import Preview</h3>
+          <div id="travelImportPreview" class="table-wrap"></div>
         </div>
       </section>
 
@@ -2256,7 +2295,7 @@
           <h2 id="travelAdminHeroTitle">Add a holiday.</h2>
           <p id="travelAdminHeroText">Create or edit parent-managed holiday and cruise records without putting admin forms on Seb's explore pages.</p>
         </div>
-        <div class="notice warn">This area is for parent-managed travel data. It keeps Seb's explore pages browse-first while preserving the existing travel data schema and import/export flow.</div>
+        <div class="notice warn">This area is for parent-managed travel data. It keeps Seb's explore pages browse-first while preserving the existing travel data schema. Travel import now lives on Manage → Import Travel. Travel export lives in Settings & data.</div>
         <div class="card travel-editor-card" id="travelEditorCard">
           <div class="travel-editor-toggle">
             <div>
@@ -2301,21 +2340,14 @@
           </div>
         </div>
 
-        <div class="card travel-tools-card">
-          <h3>Travel data tools</h3>
-          <p class="help-text">Export or import parent-managed trip and flight records. This is separate from almanac place enrichment.</p>
-          <div class="toolbar"><button class="button secondary" id="exportTravelDataBtn" type="button">Export travel data</button><button class="button primary" id="importTravelDataBtn" type="button">Import travel data</button></div>
-          <textarea id="travelDataImportText" class="travel-import-area" placeholder="Paste seb-almanac-travel-data-v1 JSON here, or use the export file as a template."></textarea>
-          <div id="travelDataStatus" style="margin-top:12px;"></div>
-        </div>
 
       </section>
 
       <section id="cruises" class="section">
         <div class="hero">
           <div class="eyebrow">Cruise view</div>
-          <h2>Seb's ships, routes and ports.</h2>
-          <p>Browse Seb's cruises by ship, line and route. Choose one cruise to activate the map and see its listed ports together.</p>
+          <h2>Seb's ships, cruise lines and ports</h2>
+          <p>Browse Seb's cruises by ship, cruise line and ports. Choose one cruise to activate the map and see its port pins together.</p>
         </div>
         <div class="card">
           <div class="travel-control-grid">
@@ -2330,7 +2362,7 @@
           <div><div id="cruiseCards" class="travel-event-grid"></div></div>
           <div class="card">
             <h3>Selected cruise map</h3>
-            <p class="help-text">Choose a cruise to see its ports together. Lines are simple visual guides between listed ports, not exact sailing tracks.</p>
+            <p class="help-text">Choose a cruise to see its port pins together.</p>
             <div id="cruiseRouteMap" class="travel-mini-map"></div>
             <div id="cruiseMapStatus" class="help-text" style="margin-top:8px;"></div>
             <div id="cruisePortList" class="route-list"></div>
@@ -2443,7 +2475,7 @@
           <div class="timeline-bulk-head">
             <div>
               <h3>Bulk visit details</h3>
-              <p class="help-text">Select places above, or select filtered records, then add the same month, trip and travelling group to them together.</p>
+              <p class="help-text">Select places in the timeline, then add the same month, trip and travelling group to them together.</p>
             </div>
             <div class="timeline-select-row">
               <span class="timeline-selected-count" id="timelineSelectedCount">0 selected</span>
@@ -2614,6 +2646,14 @@
               <input id="restoreFile" class="sr-only" type="file" accept="application/json,.json" />
               <button class="button secondary" id="restoreBtn">Restore backup</button>
             </div>
+            <div class="notice" style="margin-top:16px; margin-bottom:0;">
+              <strong>Travel data export</strong>
+              <p class="help-text" style="margin-top:6px;">Export only parent-managed holidays, cruises and flights as <strong>seb-almanac-travel-data-v1</strong>. Use Import Travel to bring it back in.</p>
+              <div class="toolbar" style="margin-top:10px;">
+                <button class="button secondary" id="exportTravelDataBtn" type="button">Export Travel Data</button>
+              </div>
+              <div id="travelDataExportStatus" style="margin-top:12px;"></div>
+            </div>
             <div id="backupStatus" style="margin-top:14px;"></div>
           </div>
           <div class="card">
@@ -2685,7 +2725,9 @@
       timelineSelection: new Set(),
       timelineBulkPreview: null,
       travelEvents: [],
-      flightSegments: []
+      flightSegments: [],
+      pendingTravelImport: null,
+      travelImportPlan: null
     };
     let mapLibreMap = null;
     let mapLibreMarkers = [];
@@ -5181,7 +5223,7 @@ Required JSON shape:
       renderTimelineYearJump(grouped);
       const rail = document.getElementById('timelineRail');
       if (!sorted.length) {
-        rail.innerHTML = `<div class="empty-state"><span class="big">🗓️</span>No month/year timeline entries match this view yet. Parent timeline maintenance lives under Manage, Edit Timeline.</div>`;
+        rail.innerHTML = `<div class="empty-state"><span class="big">🗓️</span>No month/year timeline entries match this view yet. Places without usable month/year are listed below.</div>`;
       } else {
         rail.innerHTML = [...grouped.entries()].map(([year, months]) => {
           const yearCount = [...months.values()].reduce((sum, arr) => sum + arr.length, 0);
@@ -5506,10 +5548,10 @@ Required JSON shape:
         listEl.innerHTML = '';
         return;
       }
-      const portPlaces = eventPortPlaces(event); listEl.innerHTML = (event.ports || []).length ? event.ports.map((port,i) => { const p = state.places.find(x => placeNameMatches(x,[port])); return `<div class="route-row"><span class="route-number">${i+1}</span><div><div class="place-title">${escapeHtml(port)}</div><div class="place-subtitle">${p ? escapeHtml(typeLabel(p.placeType)) : 'Port record not yet linked'}</div></div>${p ? `<button class="mini-button" data-open-place="${escapeHtml(p.id)}">Open</button>` : ''}</div>`; }).join('') : `<div class="travel-empty">No ports recorded yet.</div>`;
+      const portPlaces = eventPortPlaces(event); listEl.innerHTML = (event.ports || []).length ? event.ports.map((port) => { const p = state.places.find(x => placeNameMatches(x,[port])); return `<div class="route-row"><span class="route-number">⚓</span><div><div class="place-title">${escapeHtml(port)}</div><div class="place-subtitle">${p ? escapeHtml(typeLabel(p.placeType)) : 'Port record not yet linked'}</div></div>${p ? `<button class="mini-button" data-open-place="${escapeHtml(p.id)}">Open</button>` : ''}</div>`; }).join('') : `<div class="travel-empty">No ports recorded yet.</div>`;
       if (!portPlaces.length) { mapEl.innerHTML = `<div class="map-diagnostic"><div class="map-diagnostic-card"><h4>Map waiting for port coordinates</h4><p>Enrich port place records to map this itinerary.</p></div></div>`; statusEl.textContent = `${event.ports?.length || 0} ports listed, 0 mapped.`; return; }
-      await renderPointRouteMap({ mapEl, statusEl, points: portPlaces.map((p,i) => ({ lon:Number(p.geo.longitude), lat:Number(p.geo.latitude), label: placeDisplayName(p), subtitle:typeLabel(p.placeType), index:i+1, placeId:p.id })), lineId: 'cruise-route-line', sourceId: 'cruise-route-source', mapRef: 'cruise' });
-      statusEl.textContent = `${portPlaces.length} mapped ports shown.`;
+      await renderPointRouteMap({ mapEl, statusEl, points: portPlaces.map((p) => ({ lon:Number(p.geo.longitude), lat:Number(p.geo.latitude), label: placeDisplayName(p), subtitle:typeLabel(p.placeType), index:'⚓', placeId:p.id })), lineId: 'cruise-route-line', sourceId: 'cruise-route-source', mapRef: 'cruise' });
+      statusEl.textContent = `${portPlaces.length} mapped port pin${portPlaces.length === 1 ? '' : 's'} shown.`;
     }
     async function renderCruises() {
       const el = document.getElementById('cruiseCards'); if (!el) return; renderCruiseFilters(); const events = filteredCruiseEvents(); renderTravelSummary('cruiseSummary', events, [['🚢', events.length, 'Cruises shown'], ['⚓', unique(events.flatMap(e => e.ports || [])).length, 'Ports listed'], ['🛳️', unique(events.map(e => e.shipName || e.accommodationOrShip).filter(Boolean)).length, 'Ships'], ['🏳️', unique(events.map(e => e.cruiseLine).filter(Boolean)).length, 'Cruise lines']]); el.innerHTML = events.length ? events.map(e => renderTravelEventCard(e, { cruiseSelect:true })).join('') : `<div class="travel-empty">No cruise records yet. Use Manage → Add Cruise, or import travel data from the parent tools.</div>`; const selectedId = document.getElementById('cruiseEventFilter')?.value; await renderCruiseRouteMap(selectedId && selectedId !== 'all' ? events.find(e => e.id === selectedId) || null : null);
@@ -5536,16 +5578,155 @@ Required JSON shape:
       if (!targetMap) { mapEl.innerHTML = ''; targetMap = new maplibregl.Map({ container: mapEl, style: mapLibreRasterStyle(), center:[0,20], zoom:1.2, attributionControl:true }); targetMap.addControl(new maplibregl.NavigationControl({ visualizePitch:true }), 'top-left'); await new Promise((res,rej)=>{ const timer=setTimeout(()=>rej(new Error('Map load timed out.')),12000); targetMap.once('load',()=>{clearTimeout(timer);res();}); targetMap.once('error',e=>{clearTimeout(timer);rej(e?.error||new Error('Map failed to load.'));}); }); if (isFlight) flightMapLibreMap = targetMap; else cruiseMapLibreMap = targetMap; }
       markers.forEach(m => { try { m.remove(); } catch {} }); markers.length = 0;
       const bounds = new maplibregl.LngLatBounds(); points.forEach(pt => { bounds.extend([pt.lon, pt.lat]); const el=document.createElement('button'); el.type='button'; el.className='adventure-marker'; el.innerHTML=`<span>${pt.index || '•'}</span>`; const popupHtml = `<strong>${escapeHtml(pt.label)}</strong><br>${escapeHtml(pt.subtitle || '')}${pt.placeId ? `<div style="margin-top:8px;"><button class="mini-button" data-open-place="${escapeHtml(pt.placeId)}">Open place</button></div>` : ''}`; const marker=new maplibregl.Marker({element:el,anchor:'bottom'}).setLngLat([pt.lon,pt.lat]).setPopup(new maplibregl.Popup({offset:24}).setHTML(popupHtml)).addTo(targetMap); markers.push(marker); });
-      let lines=[]; if (isFlight) { flightSegments().filter(f => filteredFlightSegments().some(x => x.id === f.id)).forEach(f => { const a=AIRPORT_COORDS[String(f.fromIata||'').toUpperCase()], b=AIRPORT_COORDS[String(f.toIata||'').toUpperCase()]; if (a && b) lines.push({ type:'Feature', properties:{}, geometry:{ type:'LineString', coordinates:curvedLine(a,b) }}); }); } else if (points.length > 1) { lines.push({ type:'Feature', properties:{}, geometry:{ type:'LineString', coordinates:points.map(p => [p.lon,p.lat]) }}); }
-      const data={ type:'FeatureCollection', features:lines }; if (targetMap.getSource(sourceId)) targetMap.getSource(sourceId).setData(data); else { targetMap.addSource(sourceId,{type:'geojson',data}); targetMap.addLayer({ id:lineId, type:'line', source:sourceId, paint:{ 'line-color':'#28706a','line-width':3,'line-opacity':.72 }}); }
+      let lines=[]; if (isFlight) { flightSegments().filter(f => filteredFlightSegments().some(x => x.id === f.id)).forEach(f => { const a=AIRPORT_COORDS[String(f.fromIata||'').toUpperCase()], b=AIRPORT_COORDS[String(f.toIata||'').toUpperCase()]; if (a && b) lines.push({ type:'Feature', properties:{}, geometry:{ type:'LineString', coordinates:curvedLine(a,b) }}); }); }
+      if (isFlight) { const data={ type:'FeatureCollection', features:lines }; if (targetMap.getSource(sourceId)) targetMap.getSource(sourceId).setData(data); else { targetMap.addSource(sourceId,{type:'geojson',data}); targetMap.addLayer({ id:lineId, type:'line', source:sourceId, paint:{ 'line-color':'#28706a','line-width':3,'line-opacity':.72 }}); } } else if (targetMap.getLayer(lineId)) { try { targetMap.removeLayer(lineId); } catch {} if (targetMap.getSource(sourceId)) { try { targetMap.removeSource(sourceId); } catch {} } }
       if (points.length === 1) targetMap.flyTo({center:[points[0].lon,points[0].lat],zoom:6,essential:false}); else if (points.length) targetMap.fitBounds(bounds,{padding:58,maxZoom:6,duration:700}); setTimeout(()=>targetMap.resize(),150);
     }
     async function renderFlightMap() { const mapEl=document.getElementById('flightRouteMap'), statusEl=document.getElementById('flightMapStatus'); if(!mapEl||!statusEl)return; const flights=filteredFlightSegments(); const points=[]; flights.forEach(f=>{ const a=AIRPORT_COORDS[String(f.fromIata||'').toUpperCase()], b=AIRPORT_COORDS[String(f.toIata||'').toUpperCase()]; if(a) points.push({lon:a[0],lat:a[1],label:`${f.fromAirport||f.fromIata}`,subtitle:f.fromIata,index:'✈'}); if(b) points.push({lon:b[0],lat:b[1],label:`${f.toAirport||f.toIata}`,subtitle:f.toIata,index:'✈'}); }); const uniquePoints=[]; const seen=new Set(); points.forEach(p=>{ const k=`${p.lon}|${p.lat}|${p.label}`; if(!seen.has(k)){seen.add(k);uniquePoints.push(p);} }); if(!uniquePoints.length){ mapEl.innerHTML=`<div class="map-diagnostic"><div class="map-diagnostic-card"><h4>Flight map waiting for airport codes</h4><p>Add IATA airport codes such as MAN, DXB or MCO to draw routes.</p></div></div>`; statusEl.textContent=`${flights.length} flight records shown, 0 mappable routes.`; return; } await renderPointRouteMap({mapEl,statusEl,points:uniquePoints,lineId:'flight-route-line',sourceId:'flight-route-source',mapRef:'flight'}); statusEl.textContent=`${flights.length} flight records, ${uniquePoints.length} airport point${uniquePoints.length===1?'':'s'} shown.`; }
     async function renderFlights() { const el=document.getElementById('flightCards'); if(!el)return; renderFlightFilters(); const flights=filteredFlightSegments(); renderTravelSummary('flightSummary', flights, [['✈️', flights.length, 'Flights shown'], ['🏷️', unique(flights.map(f=>f.airline).filter(Boolean)).length, 'Airlines'], ['🛫', unique(flights.flatMap(f=>[f.fromIata,f.toIata]).filter(Boolean)).length, 'Airport codes'], ['🧾', flights.filter(f=>f.confidence!=='parent_confirmed').length, 'Need details']]); el.innerHTML=flights.length?flights.map(renderFlightCard).join(''):`<div class="travel-empty">No flight records yet. Use Manage → Add Flight to create confirmed or placeholder flight legs.</div>`; await renderFlightMap(); }
-    function exportTravelData() { const payload={ schemaVersion:'seb-almanac-travel-data-v1', exportedAt:nowIso(), travelEvents:travelEvents(), flightSegments:flightSegments(), notes:'Parent-managed travel events and flight legs. This is separate from almanac place enrichment.' }; downloadJson(`seb-almanac-travel-data-${new Date().toISOString().slice(0,10)}.json`, payload); document.getElementById('travelDataStatus').innerHTML=`<div class="notice ok">Travel data exported.</div>`; }
-    async function importTravelData() { const el=document.getElementById('travelDataImportText'), st=document.getElementById('travelDataStatus'); try { const payload=JSON.parse(el.value || '{}'); if(payload.schemaVersion !== 'seb-almanac-travel-data-v1') throw new Error('Expected schemaVersion seb-almanac-travel-data-v1.'); if(!Array.isArray(payload.travelEvents) && !Array.isArray(payload.flightSegments)) throw new Error('File must contain travelEvents and/or flightSegments arrays.'); if(!confirm(`Import ${(payload.travelEvents||[]).length} trip records and ${(payload.flightSegments||[]).length} flight records? This will replace current travel-event data.`)) return; state.travelEvents=(payload.travelEvents||[]).map(e=>newTravelEventTemplate(e)); state.flightSegments=(payload.flightSegments||[]).map(f=>newFlightTemplate(f)); await putMetaValue('travelEvents', state.travelEvents); await putMetaValue('flightSegments', state.flightSegments); renderAll(); st.innerHTML=`<div class="notice ok">Travel data imported.</div>`; } catch(err) { st.innerHTML=`<div class="notice danger">Import failed: ${escapeHtml(err.message)}</div>`; } }
+    function exportTravelData() {
+      const payload = {
+        schemaVersion: 'seb-almanac-travel-data-v1',
+        exportedAt: nowIso(),
+        travelEvents: travelEvents(),
+        flightSegments: flightSegments(),
+        notes: 'Parent-managed travel events and flight legs. This is separate from almanac place enrichment.'
+      };
+      downloadJson(`seb-almanac-travel-data-${new Date().toISOString().slice(0,10)}.json`, payload);
+      const st = document.getElementById('travelDataExportStatus') || document.getElementById('travelImportStatus');
+      if (st) st.innerHTML = `<div class="notice ok">Travel data exported.</div>`;
+    }
 
-    function renderNavCounts() {
+    async function readTravelImportInput() {
+      const fileInput = document.getElementById('travelImportFile');
+      if (fileInput?.files?.length) return await fileInput.files[0].text();
+      return document.getElementById('travelImportText')?.value || '';
+    }
+
+    function validateTravelImportPayload(payload) {
+      const errors = [];
+      if (!payload || typeof payload !== 'object') errors.push('File is not a JSON object.');
+      if (payload?.schemaVersion !== 'seb-almanac-travel-data-v1') errors.push('Expected schemaVersion "seb-almanac-travel-data-v1".');
+      if (!Array.isArray(payload?.travelEvents) && !Array.isArray(payload?.flightSegments)) errors.push('Missing travelEvents and/or flightSegments arrays.');
+      if (Array.isArray(payload?.travelEvents)) {
+        payload.travelEvents.forEach((event, index) => {
+          if (!event || typeof event !== 'object') errors.push(`Travel event ${index + 1} is not an object.`);
+          if (event && !event.title && !event.legacyId) errors.push(`Travel event ${index + 1} needs a title or TL/reference value.`);
+        });
+      }
+      if (Array.isArray(payload?.flightSegments)) {
+        payload.flightSegments.forEach((flight, index) => {
+          if (!flight || typeof flight !== 'object') errors.push(`Flight segment ${index + 1} is not an object.`);
+          if (flight && !flight.fromAirport && !flight.fromIata && !flight.toAirport && !flight.toIata) errors.push(`Flight segment ${index + 1} needs at least one airport name or IATA code.`);
+        });
+      }
+      return errors;
+    }
+
+    function buildTravelImportPlan(payload) {
+      return {
+        travelEvents: (payload.travelEvents || []).map(event => newTravelEventTemplate(event)),
+        flightSegments: (payload.flightSegments || []).map(flight => newFlightTemplate(flight))
+      };
+    }
+
+    async function previewTravelImport() {
+      const status = document.getElementById('travelImportStatus');
+      const preview = document.getElementById('travelImportPreview');
+      const commitBtn = document.getElementById('commitTravelImportBtn');
+      if (commitBtn) commitBtn.disabled = true;
+      state.pendingTravelImport = null;
+      state.travelImportPlan = null;
+      try {
+        const raw = await readTravelImportInput();
+        const payload = parseImportJson(raw);
+        const errors = validateTravelImportPayload(payload);
+        if (errors.length) {
+          status.innerHTML = `<div class="notice danger"><strong>Import cannot be committed yet.</strong><br>${errors.map(escapeHtml).join('<br>')}</div>`;
+          preview.innerHTML = '';
+          return;
+        }
+        const plan = buildTravelImportPlan(payload);
+        state.pendingTravelImport = payload;
+        state.travelImportPlan = plan;
+        status.innerHTML = `<div class="notice ok">Preview ready. ${plan.travelEvents.length} trip record${plan.travelEvents.length === 1 ? '' : 's'} and ${plan.flightSegments.length} flight record${plan.flightSegments.length === 1 ? '' : 's'} detected. Commit will replace current parent-managed travel data.</div>`;
+        preview.innerHTML = renderTravelImportPreviewTable(plan);
+        if (commitBtn) commitBtn.disabled = false;
+      } catch (err) {
+        status.innerHTML = `<div class="notice danger">Could not read the import content: ${escapeHtml(err.message)}</div>`;
+        preview.innerHTML = '';
+      }
+    }
+
+    function renderTravelImportPreviewTable(plan) {
+      const rows = [
+        ...((plan.travelEvents || []).map(event => ({
+          kind: 'Trip',
+          title: event.title || event.legacyId || 'Untitled trip',
+          type: [event.category, event.tripType].filter(Boolean).join(' / ') || 'Not recorded',
+          timing: [formatDate(event.startMonth) || event.startMonth, event.status].filter(Boolean).join(' · ') || 'Not recorded',
+          linked: [
+            event.outboundFlightId ? `Outbound: ${event.outboundFlightId}` : '',
+            event.returnFlightId ? `Return: ${event.returnFlightId}` : '',
+            `${(event.linkedPlaceNames || []).length} linked place${(event.linkedPlaceNames || []).length === 1 ? '' : 's'}`
+          ].filter(Boolean).join('<br>'),
+          notes: event.flightLinkMode || event.notes || ''
+        }))),
+        ...((plan.flightSegments || []).map(flight => ({
+          kind: 'Flight',
+          title: `${flight.fromIata || flight.fromAirport || 'Unknown'} → ${flight.toIata || flight.toAirport || 'Unknown'}`,
+          type: [flight.direction, flight.confidence].filter(Boolean).join(' / ') || 'Not recorded',
+          timing: formatDate(flight.month) || flight.month || 'Not recorded',
+          linked: flight.linkedTravelEventId || 'No linked trip',
+          notes: [flight.airline || 'Unknown airline', flight.flightNumber || 'No flight number', flight.aircraft || 'No aircraft'].join('<br>')
+        })))
+      ];
+      if (!rows.length) return `<div class="empty-state"><span class="big">🧳</span>No travel records to preview.</div>`;
+      return `<table><thead><tr><th>Record</th><th>Name</th><th>Type</th><th>Timing</th><th>Linked data</th><th>Notes</th></tr></thead><tbody>${rows.map(row => `<tr>
+        <td><span class="tag type">${escapeHtml(row.kind)}</span></td>
+        <td><strong>${escapeHtml(row.title)}</strong></td>
+        <td>${escapeHtml(row.type)}</td>
+        <td>${escapeHtml(row.timing)}</td>
+        <td>${row.linked}</td>
+        <td>${row.notes.includes('<br>') ? row.notes.split('<br>').map(escapeHtml).join('<br>') : escapeHtml(row.notes)}</td>
+      </tr>`).join('')}</tbody></table>`;
+    }
+
+    async function commitTravelImport() {
+      const status = document.getElementById('travelImportStatus');
+      const plan = state.travelImportPlan;
+      if (!state.pendingTravelImport || !plan) {
+        status.innerHTML = `<div class="notice warn">Preview the travel import before committing it.</div>`;
+        return;
+      }
+      if (!confirm(`Import ${plan.travelEvents.length} trip records and ${plan.flightSegments.length} flight records? This will replace current travel-event data.`)) return;
+      state.travelEvents = plan.travelEvents;
+      state.flightSegments = plan.flightSegments;
+      await putMetaValue('travelEvents', state.travelEvents);
+      await putMetaValue('flightSegments', state.flightSegments);
+      document.getElementById('commitTravelImportBtn').disabled = true;
+      state.pendingTravelImport = null;
+      state.travelImportPlan = null;
+      renderAll();
+      status.innerHTML = `<div class="notice ok">Travel import committed. ${state.travelEvents.length} trip record${state.travelEvents.length === 1 ? '' : 's'} and ${state.flightSegments.length} flight record${state.flightSegments.length === 1 ? '' : 's'} are now loaded.</div>`;
+    }
+
+    function clearTravelImportInput() {
+      const file = document.getElementById('travelImportFile');
+      if (file) file.value = '';
+      const text = document.getElementById('travelImportText');
+      if (text) text.value = '';
+      const status = document.getElementById('travelImportStatus');
+      if (status) status.innerHTML = '';
+      const preview = document.getElementById('travelImportPreview');
+      if (preview) preview.innerHTML = '';
+      const commit = document.getElementById('commitTravelImportBtn');
+      if (commit) commit.disabled = true;
+      state.pendingTravelImport = null;
+      state.travelImportPlan = null;
+    }
+
+        function renderNavCounts() {
       document.getElementById('navTotal').textContent = state.places.length;
       document.getElementById('navKnown').textContent = state.places.filter(p => p.known).length;
       document.getElementById('navHolidays') && (document.getElementById('navHolidays').textContent = travelEvents().length);
@@ -5574,8 +5755,10 @@ Required JSON shape:
       renderHierarchy();
       renderQuiz();
       renderQuizSafetySettings();
-      document.getElementById('enrichmentPrompt').value = buildPrompt();
-      document.getElementById('importExample').textContent = JSON.stringify({
+      const enrichmentPrompt = document.getElementById('enrichmentPrompt');
+      if (enrichmentPrompt) enrichmentPrompt.value = buildPrompt();
+      const importExample = document.getElementById('importExample');
+      if (importExample) importExample.textContent = JSON.stringify({
         schemaVersion: requiredImportSchema,
         generatedAt: nowIso(),
         places: [{
@@ -5606,6 +5789,52 @@ Required JSON shape:
           notesForReview: []
         }]
       }, null, 2);
+      const travelExample = document.getElementById('travelImportExample');
+      if (travelExample) {
+        travelExample.textContent = JSON.stringify({
+          schemaVersion: 'seb-almanac-travel-data-v1',
+          exportedAt: nowIso(),
+          travelEvents: [{
+            id: 'travel_example_001',
+            legacyId: 'TL-026',
+            title: 'Mediterranean / Sun Princess, Rome to Barcelona',
+            status: 'planned',
+            category: 'cruise',
+            tripType: 'open_jaw_cruise',
+            startMonth: '2026-08',
+            durationLabel: '16 days',
+            travellers: ['Seb', 'Mummy', 'Daddy'],
+            accommodationOrShip: 'Sun Princess',
+            cruiseLine: 'Princess Cruises',
+            shipName: 'Sun Princess',
+            cruiseRoute: 'Rome to Barcelona',
+            ports: ['Civitavecchia', 'Naples', 'Chania', 'Kuşadası', 'Mykonos', 'Athens', 'Santorini', 'Bar', 'Corfu', 'Messina', 'Barcelona'],
+            flightLinkMode: 'needs_parent_confirmation',
+            outboundFlightId: 'flight_example_outbound',
+            returnFlightId: 'flight_example_return',
+            flightNotes: 'Airports known, airline and aircraft not recorded yet.',
+            linkedPlaceNames: ['Rome', 'Barcelona', 'Naples'],
+            tags: ['Planned', 'Cruise', 'Fly-cruise'],
+            notes: 'Parent-managed trip record.'
+          }],
+          flightSegments: [{
+            id: 'flight_example_outbound',
+            linkedTravelEventId: 'travel_example_001',
+            direction: 'outbound',
+            month: '2026-08',
+            fromAirport: 'Airport known or to confirm',
+            fromIata: '',
+            toAirport: 'Rome Fiumicino Airport',
+            toIata: 'FCO',
+            airline: '',
+            flightNumber: '',
+            aircraft: '',
+            confidence: 'needs_details',
+            notes: 'Placeholder flight record; do not infer missing details.'
+          }],
+          notes: 'Parent-managed travel events and flight legs. Separate from almanac place enrichment.'
+        }, null, 2);
+      }
     }
 
     function openPlaceDetail(id) {
@@ -5858,7 +6087,7 @@ Required JSON shape:
     }
 
     function isManageSection(sectionId) {
-      return ['add', 'addTravel', 'addFlight', 'editTimeline', 'queue', 'import', 'settings'].includes(sectionId);
+      return ['add', 'addTravel', 'addFlight', 'editTimeline', 'queue', 'importEnrichment', 'importTravel', 'settings'].includes(sectionId);
     }
 
     function switchSection(sectionId, options = {}) {
@@ -6024,7 +6253,9 @@ Required JSON shape:
       document.getElementById('flightDeleteBtn')?.addEventListener('click', deleteFlightFromEditor);
       document.getElementById('flightEditorNewBtn')?.addEventListener('click', () => fillFlightEditor(null));
       document.getElementById('exportTravelDataBtn')?.addEventListener('click', exportTravelData);
-      document.getElementById('importTravelDataBtn')?.addEventListener('click', importTravelData);
+      document.getElementById('previewTravelImportBtn')?.addEventListener('click', previewTravelImport);
+      document.getElementById('commitTravelImportBtn')?.addEventListener('click', commitTravelImport);
+      document.getElementById('clearTravelImportInputBtn')?.addEventListener('click', clearTravelImportInput);
       document.getElementById('mapScopeFilter')?.addEventListener('change', renderGeoPins);
       document.getElementById('mapTypeFilter')?.addEventListener('change', renderGeoPins);
       document.getElementById('mapRegionFilter')?.addEventListener('change', renderGeoPins);
