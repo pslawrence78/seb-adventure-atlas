@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Seb's Adventure Almanac</title>
+  <title>Seb's Adventure Almanac v0.31</title>
   <meta name="description" content="A local-first visual almanac of places Seb has visited." />
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
@@ -641,9 +641,17 @@
       box-shadow: 0 28px 80px rgba(0,0,0,.25);
       max-width: 920px;
       max-height: 88vh;
-      overflow: auto;
+      overflow-y: auto;
+      overflow-x: hidden;
       width: 100%;
       padding: 22px;
+    }
+
+    .modal .detail-layout,
+    .modal .detail-layout > *,
+    .modal .card,
+    .modal .article {
+      min-width: 0;
     }
 
     .modal-head {
@@ -2013,6 +2021,7 @@
           <button class="nav-button" data-section="addTravel" data-travel-create="cruise"><span class="nav-left"><span class="nav-emoji">🚢</span>Add Cruise</span></button>
           <button class="nav-button" data-section="addFlight" data-flight-create="new"><span class="nav-left"><span class="nav-emoji">✈️</span>Add Flight</span></button>
           <button class="nav-button" data-section="editTimeline"><span class="nav-left"><span class="nav-emoji">🗓️</span>Edit Timeline</span></button>
+          <button class="nav-button" data-section="importPlaces"><span class="nav-left"><span class="nav-emoji">📍</span>Import Places</span></button>
           <button class="nav-button" data-section="queue"><span class="nav-left"><span class="nav-emoji">✨</span>Enrich queue</span> <span class="pill-count" id="navQueue">0</span></button>
           <button class="nav-button" data-section="importEnrichment"><span class="nav-left"><span class="nav-emoji">📥</span>Import Enrichment</span></button>
           <button class="nav-button" data-section="importTravel"><span class="nav-left"><span class="nav-emoji">🧳</span>Import Travel</span></button>
@@ -2520,6 +2529,43 @@
 
       </section>
 
+
+      <section id="importPlaces" class="section">
+        <div class="hero">
+          <div class="eyebrow">Import Places</div>
+          <h2>Seed places from confirmed travel data.</h2>
+          <p>Import canonical place records with visit details populated before enrichment. This is designed for parent-controlled loading from the travel chronology, not for factual almanac enrichment.</p>
+        </div>
+        <div class="notice warn"><strong>Accuracy-first workflow.</strong> This importer creates or updates places and visit contexts only. Records without almanac content remain in the enrichment queue so facts, hierarchy, maps and quiz content can be added later in controlled batches.</div>
+        <div class="grid cols-2">
+          <div class="card">
+            <h3>Import JSON</h3>
+            <p class="help-text">Choose a <strong>seb-almanac-places-import-v1</strong> JSON file, or paste its contents below. The preview shows create/update actions and visit counts before anything is committed.</p>
+            <div class="toolbar" style="margin-top:12px; margin-bottom:12px;">
+              <label class="button" for="placesImportFile" style="cursor:pointer;">Choose File</label>
+              <input id="placesImportFile" class="sr-only" type="file" accept="application/json,.json,.txt" />
+            </div>
+            <label for="placesImportText">Paste JSON</label>
+            <textarea id="placesImportText" placeholder="Paste seb-almanac-places-import-v1 JSON here." style="min-height:180px;"></textarea>
+            <div class="toolbar">
+              <button class="button primary" id="previewPlacesImportBtn" type="button">Preview places import</button>
+              <button class="button secondary" id="commitPlacesImportBtn" type="button" disabled>Commit places import</button>
+              <button class="button" id="clearPlacesImportInputBtn" type="button">Clear import input</button>
+            </div>
+            <div id="placesImportStatus" style="margin-top:14px;"></div>
+          </div>
+          <div class="card">
+            <h3>Expected import format</h3>
+            <p class="help-text">Use this for place seeding only. Repeat visits should be supplied as separate <strong>visitContexts</strong>. Planned visits must remain marked as planned.</p>
+            <div class="codebox" id="placesImportExample"></div>
+          </div>
+        </div>
+        <div class="card" style="margin-top:16px;">
+          <h3>Import Preview</h3>
+          <div id="placesImportPreview" class="table-wrap"></div>
+        </div>
+      </section>
+
       <section id="hierarchy" class="section map-experience-section">
         <div class="hero map-hero">
           <div class="eyebrow">Map & hierarchy</div>
@@ -2727,7 +2773,9 @@
       travelEvents: [],
       flightSegments: [],
       pendingTravelImport: null,
-      travelImportPlan: null
+      travelImportPlan: null,
+      pendingPlacesImport: null,
+      placesImportPlan: null
     };
     let mapLibreMap = null;
     let mapLibreMarkers = [];
@@ -2773,6 +2821,7 @@
     ];
 
     const requiredImportSchema = 'seb-almanac-enrichment-v1';
+    const requiredPlacesImportSchema = 'seb-almanac-places-import-v1';
     const EXPORT_BATCH_LIMIT = 20;
 
     function nowIso() { return new Date().toISOString(); }
@@ -2941,7 +2990,7 @@
         .map((ctx, index) => normaliseVisitContext(ctx, place, index))
         .filter(ctx => !isEmptyVisitContext(ctx))
         .filter(ctx => {
-          const key = [ctx.visitDateApprox, ctx.tripContext, ctx.status, (ctx.visitedBy || []).map(normalise).sort().join(','), ctx.notes].map(normalise).join('|');
+          const key = [ctx.visitDateApprox, ctx.tripContext, ctx.status, (ctx.visitedBy || []).map(normalise).sort().join(',')].map(normalise).join('|');
           if (!key.replace(/\|/g, '')) return false;
           if (seen.has(key)) return false;
           seen.add(key);
@@ -3845,7 +3894,7 @@ Required JSON shape:
         hierarchy: Array.isArray(item.hierarchy) ? item.hierarchy : [],
         geo: item.geo || existing?.geo || null,
         almanac: item.almanac || existing?.almanac || null,
-        sources: item.sources || existing?.sources || [],
+        sources: existing?.sources || [],
         notesForReview: item.notesForReview || [],
         updatedAt: ts,
         createdAt: existing?.createdAt || ts,
@@ -3872,6 +3921,201 @@ Required JSON shape:
       await refreshState();
       toast('Almanac data imported successfully.');
     }
+
+
+
+    async function readPlacesImportInput() {
+      const fileInput = document.getElementById('placesImportFile');
+      if (fileInput?.files?.length) return await fileInput.files[0].text();
+      return document.getElementById('placesImportText')?.value || '';
+    }
+
+    function validatePlacesImportPayload(payload) {
+      const errors = [];
+      if (!payload || typeof payload !== 'object') errors.push('File is not a JSON object.');
+      if (payload?.schemaVersion !== requiredPlacesImportSchema) errors.push(`Expected schemaVersion "${requiredPlacesImportSchema}".`);
+      if (!Array.isArray(payload?.places)) errors.push('Missing places array.');
+      if (Array.isArray(payload?.places)) {
+        payload.places.forEach((p, i) => {
+          if (!p.canonicalName) errors.push(`Place ${i + 1} is missing canonicalName.`);
+          if (!p.placeType) errors.push(`Place ${i + 1} is missing placeType.`);
+          if (p.visitContexts && !Array.isArray(p.visitContexts)) errors.push(`Place ${i + 1} has visitContexts, but it is not an array.`);
+        });
+      }
+      return errors;
+    }
+
+    function buildPlacesImportPlan(payload) {
+      const claimedExistingIds = new Set();
+      const plan = [];
+      const workingPlaces = [...state.places];
+
+      payload.places.forEach((item, index) => {
+        const result = findExistingForImport(item, workingPlaces, claimedExistingIds);
+        const existing = result.place;
+        if (existing) claimedExistingIds.add(existing.id);
+        const visits = Array.isArray(item.visitContexts) ? item.visitContexts : [];
+        const action = existing ? 'update' : 'create';
+        plan.push({
+          item,
+          existingId: existing?.id || null,
+          action,
+          matchReason: result.matchReason,
+          existingName: existing?.displayName || existing?.canonicalName || '',
+          visitCount: visits.length
+        });
+
+        if (!existing) {
+          workingPlaces.push({
+            id: item.id || `__incoming_place_seed_${index}_${slugify(item.canonicalName)}`,
+            enteredName: item.displayName || item.canonicalName,
+            canonicalName: item.canonicalName,
+            displayName: item.displayName || item.canonicalName,
+            aliases: item.aliases || []
+          });
+        }
+      });
+
+      return plan;
+    }
+
+    function renderPlacesImportPreviewTable(plan) {
+      if (!plan?.length) return `<div class="empty-state"><span class="big">📍</span>No place records to preview.</div>`;
+      return `<table><thead><tr><th>Action</th><th>Place</th><th>Type</th><th>Visits</th><th>Status</th><th>Match</th></tr></thead><tbody>${plan.map(row => {
+        const p = row.item;
+        const visits = Array.isArray(p.visitContexts) ? p.visitContexts : [];
+        const periods = visits.map(v => v.visitDateApprox).filter(Boolean).sort();
+        const statuses = unique(visits.map(v => v.status || 'completed'));
+        return `<tr>
+          <td><span class="tag ${row.action === 'create' ? 'queue' : 'known'}">${row.action === 'create' ? 'Create' : 'Update'}</span>${row.existingName ? `<div class="help-text">Existing: ${escapeHtml(row.existingName)}</div>` : ''}</td>
+          <td><strong>${escapeHtml(p.displayName || p.canonicalName)}</strong>${p.iataCode ? `<div class="help-text">IATA: ${escapeHtml(p.iataCode)}</div>` : ''}${p.notesForReview?.length ? `<div class="help-text small-danger">${escapeHtml(p.notesForReview.join(' · '))}</div>` : ''}</td>
+          <td>${escapeHtml(typeLabel(p.placeType))}</td>
+          <td><strong>${visits.length}</strong>${periods.length ? `<div class="help-text">${escapeHtml(formatDate(periods[0]) || periods[0])}${periods.length > 1 ? ` → ${escapeHtml(formatDate(periods[periods.length - 1]) || periods[periods.length - 1])}` : ''}</div>` : ''}</td>
+          <td>${statuses.map(s => `<span class="tag ${s === 'planned' ? 'refresh' : 'known'}">${escapeHtml(s)}</span>`).join(' ')}</td>
+          <td>${escapeHtml(row.matchReason || '')}</td>
+        </tr>`;
+      }).join('')}</tbody></table>`;
+    }
+
+    function buildPlacesImportedPlace(item, existing) {
+      const ts = nowIso();
+      const displayName = item.displayName || item.canonicalName;
+      const importedContexts = Array.isArray(item.visitContexts) ? item.visitContexts : [];
+      const topLevelContext = (!importedContexts.length && (item.visitDateApprox || item.tripContext || item.notes || item.visitedBy)) ? [{
+        visitDateApprox: item.visitDateApprox || '',
+        tripContext: item.tripContext || '',
+        status: item.visitStatus || item.status || 'completed',
+        visitedBy: item.visitedBy || ['Seb'],
+        notes: item.notes || ''
+      }] : [];
+      const contexts = uniqueVisitContexts([
+        ...(visitContextsArray(existing) || []),
+        ...importedContexts,
+        ...topLevelContext
+      ], existing || item);
+      const first = contexts[0] || null;
+      const keepKnown = !!existing?.known || (!!item.known && !!item.almanac);
+      const next = {
+        ...(existing || {}),
+        id: existing?.id || item.id || `place_seed_${slugify(item.canonicalName)}_${Math.random().toString(16).slice(2, 7)}`,
+        enteredName: existing?.enteredName || displayName,
+        canonicalName: item.canonicalName,
+        displayName,
+        aliases: unique([...(existing?.aliases || []), ...(item.aliases || [])]),
+        canonicalKey: normalise(item.canonicalName),
+        placeType: item.placeType || existing?.placeType || 'unknown',
+        status: keepKnown ? 'known' : (item.status || existing?.status || 'captured'),
+        known: keepKnown,
+        needsRefresh: item.needsRefresh ?? existing?.needsRefresh ?? false,
+        tripContext: existing?.tripContext || item.tripContext || first?.tripContext || '',
+        visitDateApprox: normaliseVisitPeriod(existing?.visitDateApprox || item.visitDateApprox || first?.visitDateApprox || ''),
+        visitContexts: contexts,
+        visitedBy: existing?.visitedBy || item.visitedBy || first?.visitedBy || ['Seb'],
+        notes: existing?.notes || item.notes || 'Seeded from confirmed travel chronology. Enrichment has not yet been applied.',
+        hierarchy: existing?.hierarchy?.length ? existing.hierarchy : (Array.isArray(item.hierarchy) ? item.hierarchy : []),
+        geo: existing?.geo || item.geo || null,
+        almanac: existing?.almanac || item.almanac || null,
+        sources: existing?.sources || [],
+        notesForReview: unique([...(existing?.notesForReview || []), ...(item.notesForReview || [])]),
+        sourceTravelEventIds: unique([...(existing?.sourceTravelEventIds || []), ...(item.sourceTravelEventIds || [])]),
+        sourceLegacyIds: unique([...(existing?.sourceLegacyIds || []), ...(item.sourceLegacyIds || [])]),
+        updatedAt: ts,
+        createdAt: existing?.createdAt || item.createdAt || ts,
+        lastPlacesImportedAt: state.pendingPlacesImport?.generatedAt || ts,
+        importHistory: [...(existing?.importHistory || []), { importedAt: ts, schemaVersion: state.pendingPlacesImport?.schemaVersion || requiredPlacesImportSchema, importType: 'places' }]
+      };
+      if (item.iataCode || existing?.iataCode) next.iataCode = item.iataCode || existing.iataCode;
+      return withNormalisedVisitContexts(next);
+    }
+
+    async function previewPlacesImport() {
+      const status = document.getElementById('placesImportStatus');
+      const preview = document.getElementById('placesImportPreview');
+      document.getElementById('commitPlacesImportBtn').disabled = true;
+      state.pendingPlacesImport = null;
+      state.placesImportPlan = null;
+      try {
+        const raw = await readPlacesImportInput();
+        const payload = parseImportJson(raw);
+        const errors = validatePlacesImportPayload(payload);
+        if (errors.length) {
+          status.innerHTML = `<div class="notice danger"><strong>Places import cannot be committed yet.</strong><br>${errors.map(escapeHtml).join('<br>')}</div>`;
+          preview.innerHTML = '';
+          return;
+        }
+        const plan = buildPlacesImportPlan(payload);
+        state.pendingPlacesImport = payload;
+        state.placesImportPlan = plan;
+        const creates = plan.filter(x => x.action === 'create').length;
+        const updates = plan.filter(x => x.action === 'update').length;
+        const visitCount = payload.places.reduce((sum, p) => sum + (Array.isArray(p.visitContexts) ? p.visitContexts.length : 0), 0);
+        const plannedCount = payload.places.reduce((sum, p) => sum + ((p.visitContexts || []).filter(v => v.status === 'planned').length), 0);
+        const reviewNotes = payload.places.flatMap(p => (p.notesForReview || []).map(n => `${p.canonicalName}: ${n}`));
+        status.innerHTML = `<div class="notice ok">Preview ready. ${creates} new place${creates === 1 ? '' : 's'}, ${updates} update${updates === 1 ? '' : 's'} and ${visitCount} visit context${visitCount === 1 ? '' : 's'} detected.${plannedCount ? ` ${plannedCount} planned visit context${plannedCount === 1 ? '' : 's'} preserved.` : ''}</div>${reviewNotes.length ? `<div class="notice warn"><strong>Notes for review</strong><br>${reviewNotes.slice(0, 18).map(escapeHtml).join('<br>')}${reviewNotes.length > 18 ? `<br>…and ${reviewNotes.length - 18} more.` : ''}</div>` : ''}`;
+        preview.innerHTML = renderPlacesImportPreviewTable(plan);
+        document.getElementById('commitPlacesImportBtn').disabled = false;
+      } catch (err) {
+        status.innerHTML = `<div class="notice danger">Could not read the places import content: ${escapeHtml(err.message)}</div>`;
+      }
+    }
+
+    async function commitPlacesImport() {
+      if (!state.pendingPlacesImport || !state.placesImportPlan) {
+        toast('Preview a places import before committing it.');
+        return;
+      }
+      const updates = [];
+      for (const row of state.placesImportPlan) {
+        const existing = row.existingId ? state.places.find(p => p.id === row.existingId) : null;
+        updates.push(buildPlacesImportedPlace(row.item, existing));
+      }
+      await putPlaces(updates);
+      const created = state.placesImportPlan.filter(x => x.action === 'create').length;
+      const updated = state.placesImportPlan.filter(x => x.action === 'update').length;
+      const visitCount = updates.reduce((sum, p) => sum + visitContextsArray(p).length, 0);
+      document.getElementById('commitPlacesImportBtn').disabled = true;
+      document.getElementById('placesImportStatus').innerHTML = `<div class="notice ok">Places import committed. ${created} created, ${updated} updated, ${visitCount} total visit context${visitCount === 1 ? '' : 's'} now available across imported records.</div>`;
+      state.pendingPlacesImport = null;
+      state.placesImportPlan = null;
+      await refreshState();
+      toast('Places and visit contexts imported successfully.');
+    }
+
+    function clearPlacesImportInput() {
+      const file = document.getElementById('placesImportFile');
+      if (file) file.value = '';
+      const text = document.getElementById('placesImportText');
+      if (text) text.value = '';
+      const status = document.getElementById('placesImportStatus');
+      if (status) status.innerHTML = '';
+      const preview = document.getElementById('placesImportPreview');
+      if (preview) preview.innerHTML = '';
+      const commit = document.getElementById('commitPlacesImportBtn');
+      if (commit) commit.disabled = true;
+      state.pendingPlacesImport = null;
+      state.placesImportPlan = null;
+    }
+
 
 
 
@@ -5789,6 +6033,33 @@ Required JSON shape:
           notesForReview: []
         }]
       }, null, 2);
+
+      const placesImportExample = document.getElementById('placesImportExample');
+      if (placesImportExample) {
+        placesImportExample.textContent = JSON.stringify({
+          schemaVersion: requiredPlacesImportSchema,
+          generatedAt: nowIso(),
+          sourceFiles: [{ fileName: 'seb-almanac-travel-data.json' }],
+          importPolicy: {
+            purpose: 'Seed canonical place records with visit contexts before enrichment.',
+            postImportExpectation: 'Records without almanac content remain in the enrichment queue.'
+          },
+          places: [{
+            id: 'seed_jumeirah_dar_al_masyaf',
+            canonicalName: 'Jumeirah Dar Al Masyaf',
+            displayName: 'Jumeirah Dar Al Masyaf',
+            aliases: ['Dar Al Masyaf'],
+            placeType: 'hotel_resort',
+            known: false,
+            visitContexts: [
+              { visitId: 'visit_jumeirah_dar_al_masyaf_TL-008', visitLabel: 'First visit', visitDateApprox: '2022-06', tripContext: 'TL-008 – Dubai, UAE / Grand Hyatt Dubai and Dar Al Masyaf', status: 'completed', visitedBy: ['Seb', 'Mummy', 'Daddy'], notes: 'Seeded from parent-managed travel data.' },
+              { visitId: 'visit_jumeirah_dar_al_masyaf_TL-011', visitLabel: 'Second visit', visitDateApprox: '2023-06', tripContext: 'TL-011 – Dubai, UAE / Le Méridien Mina Seyahi and Dar Al Masyaf', status: 'completed', visitedBy: ['Seb', 'Mummy', 'Daddy', 'Grandma', 'Grandad'], notes: 'Seeded from parent-managed travel data.' }
+            ],
+            notes: 'Seeded from parent-managed travel data. Enrichment has not yet been applied.',
+            notesForReview: []
+          }]
+        }, null, 2);
+      }
       const travelExample = document.getElementById('travelImportExample');
       if (travelExample) {
         travelExample.textContent = JSON.stringify({
@@ -6087,7 +6358,7 @@ Required JSON shape:
     }
 
     function isManageSection(sectionId) {
-      return ['add', 'addTravel', 'addFlight', 'editTimeline', 'queue', 'importEnrichment', 'importTravel', 'settings'].includes(sectionId);
+      return ['add', 'addTravel', 'addFlight', 'editTimeline', 'importPlaces', 'queue', 'importEnrichment', 'importTravel', 'settings'].includes(sectionId);
     }
 
     function switchSection(sectionId, options = {}) {
@@ -6172,6 +6443,9 @@ Required JSON shape:
       });
       document.getElementById('previewImportBtn').addEventListener('click', previewImport);
       document.getElementById('commitImportBtn').addEventListener('click', commitImport);
+      document.getElementById('previewPlacesImportBtn')?.addEventListener('click', previewPlacesImport);
+      document.getElementById('commitPlacesImportBtn')?.addEventListener('click', commitPlacesImport);
+      document.getElementById('clearPlacesImportInputBtn')?.addEventListener('click', clearPlacesImportInput);
       document.getElementById('clearImportInputBtn').addEventListener('click', () => {
         document.getElementById('importFile').value = '';
         document.getElementById('importText').value = '';
